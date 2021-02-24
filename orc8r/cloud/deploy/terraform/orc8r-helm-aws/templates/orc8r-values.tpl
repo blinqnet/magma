@@ -192,6 +192,12 @@ nms:
       mysql_user: ${orc8r_db_user}
       mysql_pass: ${orc8r_db_pass}
       grafana_address: ${user_grafana_hostname}
+    
+    deployment:
+      spec:
+        additional_payload_mount_path: ${additional_payload_mount_path}
+        private_key_mount_path: ${private_key_mount_path}
+        public_key_mount_path: ${public_key_mount_path}
 
   nginx:
     create: true

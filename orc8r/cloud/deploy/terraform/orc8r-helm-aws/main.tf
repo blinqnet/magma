@@ -198,7 +198,11 @@ data "template_file" "orc8r_values" {
     alertmanager_url          = format("%s-alertmanager:9093", var.helm_deployment_name)
     prometheus_url            = format("%s-prometheus:9090", var.helm_deployment_name)
 
-    prometheus_configurer_version   = var.prometheus_configurer_version
+    additional_payload_mount_path = var.additional_payload_mount_path
+    private_key_mount_path        = var.private_key_mount_path
+    public_key_mount_path         = var.public_key_mount_path
+
+    prometheus_configurer_version = var.prometheus_configurer_version
     alertmanager_configurer_version = var.alertmanager_configurer_version
 
     dp_enabled          = var.dp_enabled

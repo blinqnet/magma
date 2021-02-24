@@ -266,6 +266,18 @@ variable "elasticsearch_retention_days" {
   default     = 7
 }
 
+variable "elasticsearch_curator_name" {
+  description = "Name of the elasticsearch-curator helm deployment"
+  type        = string
+  default     = "elasticsearch-curator"
+}
+
+variable "fluentd_deployment_name" {
+  description = "Name of the fluentd helm deployment"
+  type        = string
+  default     = "fluentd"
+}
+
 variable "elasticsearch_port" {
   description = "Port Elastic search is listening."
   type        = number
@@ -498,4 +510,26 @@ variable "dp_sas_ca" {
   description = "SAS CA filename."
   type        = string
   default     = "ca.crt"
+
+# FreedomFi Specific deployment flags
+##############################################################################
+
+variable "private_key_passphrase" {
+  description = "Private GPG key passphrase"
+  type        = string
+}
+
+variable "private_key_mount_path" {
+  description = "Private GPG key mount path in the container"
+  type        = string
+}
+
+variable "public_key_mount_path" {
+  description = "Public GPG key mount path in the container"
+  type        = string
+}
+
+variable "additional_payload_mount_path" {
+  description = "Additional payload for license file mount path"
+  type        = string
 }

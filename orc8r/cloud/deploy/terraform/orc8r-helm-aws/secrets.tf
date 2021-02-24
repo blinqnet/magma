@@ -58,6 +58,19 @@ locals {
   ]
 }
 
+resource "kubernetes_secret" "ffi_config" {
+  metadata {
+    name      = "ffi-config"
+    namespace = kubernetes_namespace.orc8r.metadata[0].name
+  }
+  data = {
+    "private.asc" = file("${var.seed_certs_dir}/../private.asc")
+    "public.asc" = file("${var.seed_certs_dir}/../public.asc")
+    "additional_payload" = file("${var.seed_certs_dir}/../additional_payload")
+    "private_key_passphrase" = var.private_key_passphrase
+  }
+}
+
 resource "kubernetes_secret" "orc8r_certs" {
   metadata {
     name      = "orc8r-certs"
