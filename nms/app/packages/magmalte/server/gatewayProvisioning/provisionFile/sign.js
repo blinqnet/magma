@@ -18,7 +18,6 @@ import * as openpgp from 'openpgp';
 import fs from 'fs';
 import path from 'path';
 
-const passphrase = 'asdjG123Hdaj316dhH';
 const key = fs.readFileSync(
   path.resolve(__dirname, 'keys/private.asc'),
   'utf-8',
@@ -28,7 +27,7 @@ const sign = async (payload: string): Promise<string> => {
   const {
     keys: [privateKey],
   } = await openpgp.key.readArmored(key);
-  await privateKey.decrypt(passphrase);
+  await privateKey.decrypt(process.env.PROVISION_FILE_SIGNATURE_PASSPHRASE);
 
   const {data: cleartext} = await openpgp.sign({
     message: openpgp.cleartext.fromText(payload),

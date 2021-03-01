@@ -15,11 +15,15 @@
  */
 
 import express from 'express';
+import fs from 'fs';
 import sign from './provisionFile/sign';
 import {AccessRoles} from '@fbcnms/auth/roles';
 import {access} from '@fbcnms/auth/access';
 import type {ExpressResponse} from 'express';
 import type {FBCNMSRequest} from '@fbcnms/auth/access';
+const logger = require('@fbcnms/logging').getLogger(module);
+
+const {ADDITIONAL_PROVISION_FILE_PAYLOAD_FILENAME} = process.env;
 
 const router: express.Router<FBCNMSRequest, ExpressResponse> = express.Router();
 
@@ -30,6 +34,26 @@ router.get('/', access(AccessRoles.USER), async (req, res) => {
     isMasterOrg && typeof req.query?.tenant === 'string'
       ? `tenant: ${req.query.tenant}`
       : `tenant: ${currentTenant}`;
+
+  if (ADDITIONAL_PROVISION_FILE_PAYLOAD_FILENAME) {
+    try {
+      const additionalPayloadBuffer = await fs.promises.readFile(
+        ADDITIONAL_PROVISION_FILE_PAYLOAD_FILENAME,
+      );
+      const additionalPayload = additionalPayloadBuffer.toString().trim();
+
+      if (!!additionalPayload) {
+        filePayload = basePayload + '\n' + additionalPayload;
+      } else {
+        filePayload = basePayload;
+      }
+    } catch (e) {
+      logger.error(e);
+      filePayload = basePayload;
+    }
+  } else {
+    filePayload = basePayload;
+  }
 
   res.statusCode = 200;
   res.attachment('freedomfi.lic');
