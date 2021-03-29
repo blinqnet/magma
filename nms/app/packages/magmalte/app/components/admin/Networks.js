@@ -25,6 +25,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import EditIcon from '@material-ui/icons/Edit';
 import EditNetworkDialog from './EditNetworkDialog';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import LoadingFiller from '@fbcnms/ui/components/LoadingFiller';
 import MagmaV1API from '@fbcnms/magma-api/client/WebClient';
 import NestedRouteLink from '@fbcnms/ui/components/NestedRouteLink';
@@ -39,6 +40,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import axios from 'axios';
 
+import Typography from '@material-ui/core/Typography';
 import useMagmaAPI from '@fbcnms/ui/magma/useMagmaAPI';
 import {Route} from 'react-router-dom';
 import {makeStyles} from '@material-ui/styles';
@@ -47,7 +49,7 @@ import {useCallback, useState} from 'react';
 import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import {useRouter} from '@fbcnms/ui/hooks';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   header: {
     margin: '10px',
     display: 'flex',
@@ -58,6 +60,9 @@ const useStyles = makeStyles(() => ({
   },
   noNetworks: {
     height: '70vh',
+  },
+  noNetworksParagraph: {
+    marginBottom: theme.spacing(1),
   },
 }));
 
@@ -146,8 +151,31 @@ function Networks() {
       {rows.length === 0 ? (
         <div className={classes.noNetworks}>
           <NoNetworksMessage>
-            You currently do not have any networks configured. Click "Add
-            Network" to create a new network
+            <Typography className={classes.noNetworksParagraph} variant="h6">
+              Seems like nothing is configured in your Orc8r for now!
+            </Typography>
+            <Typography className={classes.noNetworksParagraph} variant="h6">
+              To begin configuring your Private LTE/5G network, please follow
+              the steps in this{' '}
+              <Link
+                target="blank"
+                href="https://freedomfi.com/quick-start-guide"
+                onClick={e => e.preventDefault}>
+                Quick Start Guide
+              </Link>
+              .
+            </Typography>
+            <Typography className={classes.noNetworksParagraph} variant="h6">
+              We understand that cellular networks are complicated, so if you
+              stumble along the way, please join us on{' '}
+              <Link
+                target="blank"
+                href="https://join.slack.com/t/freedomfi/shared_invite/zt-jj6s5ifm-oql1eSudYWrkeJ2Pv7hvFw"
+                onClick={e => e.preventDefault}>
+                FreedomFi Slack
+              </Link>{' '}
+              and give us a holler!
+            </Typography>
           </NoNetworksMessage>
         </div>
       ) : (

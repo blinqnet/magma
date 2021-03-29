@@ -16,6 +16,7 @@
 
 import AddEditEnodeButton from './EnodebDetailConfigEdit';
 import AddEditGatewayButton from './GatewayDetailConfigEdit';
+import Button from '@material-ui/core/Button';
 import AddEditGatewayPoolButton from './GatewayPoolEdit';
 import CellWifiIcon from '@material-ui/icons/CellWifi';
 import Enodeb from './EquipmentEnodeb';
@@ -29,10 +30,17 @@ import React from 'react';
 import SettingsInputAntennaIcon from '@material-ui/icons/SettingsInputAntenna';
 import TopBar from '../../components/TopBar';
 import UpgradeButton from './UpgradeTiersDialog';
+import {colors} from '../../theme/default';
+import {makeStyles} from '@material-ui/styles';
 
 import {Redirect, Route, Switch} from 'react-router-dom';
 import {useRouter} from '@fbcnms/ui/hooks';
 
+const useStyles = makeStyles(() => ({
+  downloadProvisionFileButton: {
+    color: colors.primary.white,
+  },
+}));
 function EquipmentDashboard() {
   const {relativePath, relativeUrl} = useRouter();
 
@@ -58,6 +66,7 @@ function EquipmentDashboard() {
 }
 
 function EquipmentDashboardInternal() {
+  const classes = useStyles();
   const {relativePath, relativeUrl} = useRouter();
 
   return (
@@ -77,6 +86,15 @@ function EquipmentDashboardInternal() {
                 spacing={2}>
                 <Grid item>
                   <UpgradeButton />
+                </Grid>
+                <Grid item>
+                  <Button
+                    className={classes.downloadProvisionFileButton}
+                    href="/provisionfile"
+                    title="Download provision file"
+                    isLink>
+                    Download provision file
+                  </Button>
                 </Grid>
                 <Grid item>
                   <AddEditGatewayButton title="Add New" isLink={false} />

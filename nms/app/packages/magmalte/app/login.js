@@ -19,19 +19,30 @@ import {} from './common/axiosConfig';
 import LoginForm from '@fbcnms/ui/components/auth/LoginForm.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import logo from './assets/magma-logo.png';
 import nullthrows from '@fbcnms/util/nullthrows';
 import {AppContextProvider} from '@fbcnms/ui/context/AppContext';
 import {BrowserRouter} from 'react-router-dom';
+import {makeStyles} from '@material-ui/styles';
 import {useHistory} from 'react-router';
+
+const useStyles = makeStyles(_theme => ({
+  logo: {
+    width: '70%',
+    marginTop: '10px',
+    marginBottom: '-20px',
+  },
+}));
 
 function LoginWrapper() {
   const history = useHistory();
+  const styles = useStyles();
   return (
     <LoginForm
       // eslint-disable-next-line no-warning-comments
       // $FlowFixMe - createHref exists
       action={history.createHref({pathname: '/user/login'})}
-      title="Magma"
+      title={<img className={styles.logo} src={logo} />}
       // eslint-disable-next-line no-warning-comments
       // $FlowFixMe - createHref exists
       ssoAction={history.createHref({pathname: '/user/login/saml'})}

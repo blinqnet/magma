@@ -32,7 +32,7 @@ import axios from 'axios';
 
 import nullthrows from '@fbcnms/util/nullthrows';
 import {AllNetworkTypes, XWFM} from '@fbcnms/types/network';
-import {CWF, FEG, FEG_LTE} from '@fbcnms/types/network';
+import {CWF, FEG, FEG_LTE, LTE} from '@fbcnms/types/network';
 import {makeStyles} from '@material-ui/styles';
 import {triggerAlertSync} from '../../state/SyncAlerts';
 import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
@@ -88,6 +88,8 @@ export default function NetworkDialog(props: Props) {
       .catch(error => setError(error.response?.data?.error || error));
   };
 
+  const availableNetworkTypes = [LTE, FEG_LTE, FEG];
+
   return (
     <Dialog open={true} onClose={props.onClose}>
       <DialogTitle>Add Network</DialogTitle>
@@ -120,14 +122,14 @@ export default function NetworkDialog(props: Props) {
             value={networkType}
             onChange={({target}) => setNetworkType(target.value)}
             input={<Input id="types" />}>
-            {AllNetworkTypes.map(type => (
+            {availableNetworkTypes.map(type => (
               <MenuItem key={type} value={type}>
                 <ListItemText primary={type} />
               </MenuItem>
             ))}
           </Select>
         </FormControl>
-        {(networkType === CWF || networkType === FEG_LTE) && (
+        {networkType === FEG_LTE && (
           <TextField
             name="fegNetworkID"
             label="Federation Network ID"

@@ -55,6 +55,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import LteNetworkContext from '../../components/context/LteNetworkContext';
 import MenuItem from '@material-ui/core/MenuItem';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
+import ProvisionedGatewaysSelect from '../../components/gatewayInventory/ProvisionedGatewaySelect';
 import React from 'react';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
@@ -62,7 +63,6 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Text from '@fbcnms/ui/components/design-system/Text';
 import nullthrows from '@fbcnms/util/nullthrows';
-
 import {AltFormField} from '../../components/FormField';
 import {
   DEFAULT_DNS_CONFIG,
@@ -72,9 +72,11 @@ import {
 } from '../../components/GatewayUtils';
 import {colors, typography} from '../../theme/default';
 import {makeStyles} from '@material-ui/styles';
-import {useContext, useEffect, useState} from 'react';
+import {patchGateway} from '../../components/gatewayInventory/network';
+import {useContext, useState, useEffect} from 'react';
 import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import {useRouter} from '@fbcnms/ui/hooks';
+import type {ProvisionedGateway} from '../../components/gatewayInventory/types';
 
 const GATEWAY_TITLE = 'Gateway';
 const RAN_TITLE = 'Ran';
@@ -115,6 +117,9 @@ const useStyles = makeStyles(_ => ({
   },
   accordionList: {
     width: '100%',
+  },
+  autoFilled: {
+    backgroundColor: '#eaeaee',
   },
 }));
 
@@ -351,6 +356,9 @@ export function ConfigEdit(props: Props) {
   const enqueueSnackbar = useEnqueueSnackbar();
   const [error, setError] = useState('');
   const ctx = useContext(GatewayContext);
+  const [isManualCreation, setIsManualCreation] = useState(true);
+  const {match} = useRouter();
+  const classes = useStyles();
 
   const [gateway, setGateway] = useState<lte_gateway>({
     ...(props.gateway || DEFAULT_GATEWAY_CONFIG),
@@ -371,6 +379,32 @@ export function ConfigEdit(props: Props) {
     props.gateway?.status?.platform_info?.packages?.[0].version ||
       DEFAULT_GATEWAY_CONFIG.status?.platform_info?.packages?.[0]?.version,
   );
+
+  const onProvisionedGatewaySelection = (
+    gateway: ?ProvisionedGateway | null,
+  ) => {
+    if (gateway) {
+      setIsManualCreation(false);
+      setChallengeKey(current => ({
+        ...current,
+        key: gateway.challenge_key,
+      }));
+      SetGatewayDevice(current => ({
+        ...current,
+        hardware_id: gateway.hardware_id,
+      }));
+    } else {
+      setIsManualCreation(true);
+      setChallengeKey(current => ({
+        ...current,
+        key: '',
+      }));
+      SetGatewayDevice(current => ({
+        ...current,
+        hardware_id: '',
+      }));
+    }
+  };
 
   const onSave = async () => {
     try {
@@ -395,6 +429,26 @@ export function ConfigEdit(props: Props) {
         }
       }
       await ctx.setState(gateway.id, gatewayInfos);
+
+      if (!props.isAdd && props.gateway) {
+        const currentGatewayId = props.gateway.device.hardware_id;
+        const newGatewayId = gatewayInfos.device.hardware_id;
+
+        if (currentGatewayId !== newGatewayId) {
+          await patchGateway(currentGatewayId, {
+            network: null,
+          });
+        }
+      } else {
+        const newGatewayId = gatewayInfos.device.hardware_id;
+
+        if (!isManualCreation) {
+          await patchGateway(newGatewayId, {
+            network: match.params.networkId,
+          });
+        }
+      }
+
       enqueueSnackbar('Gateway saved successfully', {
         variant: 'success',
       });
@@ -413,6 +467,11 @@ export function ConfigEdit(props: Props) {
                 {error}
               </FormLabel>
             </AltFormField>
+          )}
+          {props.isAdd && (
+            <ProvisionedGatewaysSelect
+              onChange={onProvisionedGatewaySelection}
+            />
           )}
           <AltFormField label={'Gateway Name'}>
             <OutlinedInput
@@ -439,6 +498,8 @@ export function ConfigEdit(props: Props) {
           </AltFormField>
           <AltFormField label={'Hardware UUID'}>
             <OutlinedInput
+              className={!isManualCreation ? classes.autoFilled : null}
+              disabled={!isManualCreation}
               data-testid="hardwareId"
               placeholder="Eg. 4dfe212f-df33-4cd2-910c-41892a042fee"
               fullWidth={true}
@@ -474,6 +535,8 @@ export function ConfigEdit(props: Props) {
           </AltFormField>
           <AltFormField label={'Challenge Key'}>
             <OutlinedInput
+              className={!isManualCreation ? classes.autoFilled : null}
+              disabled={!isManualCreation}
               data-testid="challengeKey"
               placeholder="A base64 bytestring of the key in DER format"
               fullWidth={true}

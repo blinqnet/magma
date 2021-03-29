@@ -61,6 +61,8 @@ const sequelizeSessionStore = new SessionStore({db: sequelize});
 
 // FBC express initialization
 const app = express<FBCNMSRequest, ExpressResponse>();
+app.use('/static', express.static(path.join(__dirname, 'static')));
+
 app.set('trust proxy', 1);
 app.use(organizationMiddleware());
 app.use(appMiddleware());
@@ -117,6 +119,8 @@ app.get('/data/LteMetrics', (req, res) => res.send(lteMetricsJsonData));
 // Trigger syncing of automatically generated alerts
 app.use('/sync_alerts', access(USER), require('../alerts/routes.js').default);
 
+app.use('/gateways', require('./gateways/routes').default);
+app.use('/provisionfile', require('./gatewayProvisioning/routes').default);
 app.use('/', csrfMiddleware(), access(USER), require('./main/routes').default);
 
 export default app;

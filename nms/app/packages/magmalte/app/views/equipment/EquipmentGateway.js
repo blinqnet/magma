@@ -43,6 +43,7 @@ import {
 import {SelectEditComponent} from '../../components/ActionTable';
 import {colors} from '../../theme/default';
 import {makeStyles} from '@material-ui/styles';
+import {patchGateway} from '../../components/gatewayInventory/network';
 import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import {useRouter} from '@fbcnms/ui/hooks';
 
@@ -396,16 +397,22 @@ function GatewayStatusTable(props: WithAlert & {refresh: boolean}) {
                     return;
                   }
 
-                  try {
-                    await gwCtx.setState(currRow.id);
-                  } catch (e) {
-                    enqueueSnackbar('failed deleting gateway ' + currRow.id, {
-                      variant: 'error',
-                    });
-                  }
-                });
+                    try {
+                      await gwCtx.setState(currRow.id);
+                      await patchGateway(
+                        gwCtx.state[currRow.id].device.hardware_id,
+                        {
+                          network: null,
+                        },
+                      );
+                    } catch (e) {
+                      enqueueSnackbar('failed deleting gateway ' + currRow.id, {
+                        variant: 'error',
+                      });
+                    }
+                  });
+              },
             },
-          },
         ]}
         options={{
           actionsColumnIndex: -1,

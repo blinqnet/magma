@@ -13,10 +13,6 @@
  * @flow
  * @format
  */
-import type {NetworkType} from '@fbcnms/types/network';
-
-import AppContext from '@fbcnms/ui/context/AppContext';
-import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import MagmaV1API from '@fbcnms/magma-api/client/WebClient';
@@ -29,11 +25,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import classNames from 'classnames';
 import useMagmaAPI from '@fbcnms/ui/magma/useMagmaAPI';
 
-import {LTE, coalesceNetworkType} from '@fbcnms/types/network';
 import {NetworkEditDialog} from '../views/network/NetworkEdit';
 import {colors} from '../theme/default';
 import {makeStyles} from '@material-ui/styles';
-import {useCallback, useContext, useEffect, useState} from 'react';
+import {useCallback, useContext, useState} from 'react';
 
 const useStyles = makeStyles(_ => ({
   button: {
@@ -96,9 +91,7 @@ const useStyles = makeStyles(_ => ({
 const NetworkSelector = () => {
   const classes = useStyles();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const appContext = useContext(AppContext);
   const [networkIds, setNetworkIds] = useState([]);
-  const [networkType, setNetworkType] = useState<?NetworkType>(null);
   const [lastRefreshTime, setLastRefreshTime] = useState(new Date().getTime());
   const [isNetworkAddOpen, setNetworkAddOpen] = useState(false);
   const {networkId} = useContext(NetworkContext);
@@ -109,19 +102,6 @@ const NetworkSelector = () => {
     useCallback(resp => setNetworkIds(resp), []),
     lastRefreshTime,
   );
-
-  useEffect(() => {
-    const fetchNetworkType = async () => {
-      if (networkId) {
-        const networkType = await MagmaV1API.getNetworksByNetworkIdType({
-          networkId,
-        });
-        setNetworkType(coalesceNetworkType(networkId, networkType));
-      }
-    };
-
-    fetchNetworkType();
-  }, [networkId]);
 
   if (!networkId) {
     return null;
@@ -155,24 +135,6 @@ const NetworkSelector = () => {
                 <Text className={classes.networkItemText}>{id}</Text>
               </ListItem>
             ))}
-            {appContext.user.isSuperUser && networkType === LTE && (
-              <>
-                <Divider />
-                <ListItem
-                  key="create_network"
-                  classes={{
-                    root: classes.listItemRoot,
-                    gutters: classes.itemGutters,
-                  }}
-                  button
-                  component="a"
-                  onClick={() => setNetworkAddOpen(true)}>
-                  <Text className={classes.networkItemText}>
-                    Create Network
-                  </Text>
-                </ListItem>
-              </>
-            )}
           </List>
         }
         onOpen={() => setIsMenuOpen(true)}
