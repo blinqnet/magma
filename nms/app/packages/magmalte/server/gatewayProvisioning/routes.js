@@ -30,7 +30,8 @@ const router: express.Router<FBCNMSRequest, ExpressResponse> = express.Router();
 router.get('/', access(AccessRoles.USER), async (req, res) => {
   const {name: currentTenant, isMasterOrg} = await req.organization();
 
-  const filePayload =
+  let filePayload;
+  const basePayload =
     isMasterOrg && typeof req.query?.tenant === 'string'
       ? `tenant: ${req.query.tenant}`
       : `tenant: ${currentTenant}`;
