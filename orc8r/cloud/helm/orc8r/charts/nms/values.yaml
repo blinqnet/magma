@@ -48,7 +48,8 @@ magmalte:
     spec:
       operator_cert_name: admin_operator.pem
       operator_key_name: admin_operator.key.pem
-
+      additional_payload_mount_path: /usr/src/packages/magmalte/server/gatewayProvisioning/provisionFile/additional_payload
+      private_key_mount_path: /usr/src/packages/magmalte/server/gatewayProvisioning/provisionFile/keys/private.asc
   service:
     type: ClusterIP
     http:

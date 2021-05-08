@@ -96,6 +96,18 @@ spec:
                   key: MYSQL_USER
             - name: USER_GRAFANA_ADDRESS
               value: {{ .Values.magmalte.env.grafana_address }}
+            - name: ADDITIONAL_PROVISION_FILE_PAYLOAD_FILENAME
+              value: {{ .Values.magmalte.deployment.spec.additional_payload_mount_path }}
+            - name: FFI_PRIVATE_KEY_FILENAME
+              value: {{ .Values.magmalte.deployment.spec.private_key_mount_path }}
+            - name: FFI_PUBLIC_KEY_FILENAME
+              value: {{ .Values.magmalte.deployment.spec.public_key_mount_path }}
+            - name: PROVISION_FILE_SIGNATURE_PASSPHRASE
+              valueFrom:
+                secretKeyRef:
+                  name: ffi-config
+                  key: private_key_passphrase
+
           livenessProbe:
             exec:
               command:
@@ -111,9 +123,22 @@ spec:
             - name: orc8r-secrets-certs
               mountPath: /run/secrets/admin_operator.key.pem
               subPath: {{ .Values.magmalte.deployment.spec.operator_key_name }}
+            - name: ffi-config-volume
+              mountPath: {{ .Values.magmalte.deployment.spec.private_key_mount_path }}
+              subPath: private.asc
+            - name: ffi-config-volume
+              mountPath: {{ .Values.magmalte.deployment.spec.public_key_mount_path }}
+              subPath: public.asc
+            - name: ffi-config-volume
+              mountPath: {{ .Values.magmalte.deployment.spec.additional_payload_mount_path }}
+              subPath: additional_payload
       volumes:
         - name: orc8r-secrets-certs
           secret:
             secretName: {{ required "secret.certs must be provided" .Values.secret.certs }}
+            defaultMode: 0444
+        - name: ffi-config-volume
+          secret:
+            secretName: ffi-config
             defaultMode: 0444
 {{- end }}
