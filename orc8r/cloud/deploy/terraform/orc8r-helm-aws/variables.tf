@@ -296,18 +296,6 @@ variable "elasticsearch_curator_log_level" {
   default     = "INFO"
 }
 
-variable "elasticsearch_curator_name" {
-  description = "Name of the elasticsearch-curator helm deployment"
-  type        = string
-  default     = "elasticsearch-curator"
-}
-
-variable "fluentd_deployment_name" {
-  description = "Name of the fluentd helm deployment"
-  type        = string
-  default     = "fluentd"
-}
-
 ##############################################################################
 # Secret configuration and values
 ##############################################################################
