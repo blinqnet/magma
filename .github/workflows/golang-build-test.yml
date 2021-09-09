@@ -1,0 +1,86 @@
+---
+name: Golang Build & Test
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  pre_job_src_go_determinator:
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          # Only run the main job for changes including the following paths
+          paths: '[".github/workflows/golang-build-test.yml", "src/go/**"]'
+
+  build_src_go:
+    if: ${{ needs.pre_job_src_go_determinator.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        go-version: [1.17.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        run: |
+          cd src/go/
+          go build ./...
+
+  test_src_go:
+    if: ${{ needs.pre_job_src_go_determinator.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        go-version: [1.17.x]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        run: |
+          go install gotest.tools/gotestsum@latest
+          cd src/go/
+          find / -name gotestsum
+          gotestsum --format=standard-verbose -- -race ./...
+
+  codecov_src_go:
+    if: ${{ needs.pre_job_src_go_determinator.outputs.should_skip != 'true' }}
+    strategy:
+      matrix:
+        go-version: [1.17.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Test
+        run: |
+          cd src/go/
+          go test -race -coverprofile=coverage.txt -covermode=atomic ./...
+      - name: Codecov.io Upload
+        uses: codecov/codecov-action@v2
+        with:
+          flags: src_go
+          fail_ci_if_error: true
+          verbose: true
