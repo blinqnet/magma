@@ -17,6 +17,7 @@ aliases:
         only:
           - master
           - develop
+          - pr-test-mconfig
   - &lte_build_verify
     paths: "orc8r lte"
   - &c_cpp_build_verify
@@ -107,8 +108,8 @@ orbs:
                     exit 0
                   fi
                 done
-                echo "No changes in [$paths]"
-                circleci step halt
+                echo "Short circuiting change detection"
+                exit 0
 
 commands:
   install-go:
