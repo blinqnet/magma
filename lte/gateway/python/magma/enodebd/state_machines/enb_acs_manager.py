@@ -11,9 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import requests
 from typing import Any, List, Optional
 
 from magma.common.service import MagmaService
+from magma.configuration.service_configs import load_service_config
 from magma.enodebd.device_config.configuration_util import is_enb_registered
 from magma.enodebd.devices.device_map import get_device_handler_from_name
 from magma.enodebd.devices.device_utils import EnodebDeviceName
@@ -112,6 +114,10 @@ class StateMachineManager:
                 'under expected param path',
             )
         if not is_enb_registered(self._service.mconfig, enb_serial):
+            try:
+                self._send_device_info(inform, enb_serial)
+            except Exception as e:
+                logger.exception("Sending eNB PnP info failed", e)
             raise UnrecognizedEnodebError(
                 'eNB not registered to this Access '
                 'Gateway (serial #%s)' % enb_serial,
@@ -207,6 +213,48 @@ class StateMachineManager:
         device_handler_class = get_device_handler_from_name(device_name)
         acs_state_machine = device_handler_class(self._service)
         return acs_state_machine
+
+    def _send_device_info(self, inform: models.Inform, enb_serial):
+        device_params = self._retrieve_device_params(inform)
+        device_params['serial'] = enb_serial
+        cfg = load_service_config('enodebd')
+
+        with open(cfg['ffi_agw_serial_path'], 'r') as agw_serial_file:
+            agw_serial = agw_serial_file.readline()[:-1]
+
+        if not (cfg.get('ffi_pnp_api') and cfg.get('ffi_api_key')):
+            logger.warning("eNodeB Plug-n-Play config missing")
+            return
+
+        url = cfg['ffi_pnp_api'].format(serialId=agw_serial)
+        api_key = cfg['ffi_api_key']
+
+        response = None
+        try:
+            response = requests.post(url, json=device_params, headers={'X-API-Key': api_key})
+            response.raise_for_status()
+        except Exception as e:
+            logger.warning("Sending eNodeB info failed")
+            if response:
+                logger.warning(response.text)
+            raise
+
+        logger.debug("Successfully sent eNB PnP request:")
+        logger.debug(response.text)
+
+    @staticmethod
+    def _retrieve_device_params(inform: models.Inform):
+        desired_params = {}
+
+        if hasattr(inform, 'DeviceId'):
+            if hasattr(inform.DeviceId, 'Manufacturer'):
+                desired_params['manufacturer'] = inform.DeviceId.Manufacturer
+            if hasattr(inform.DeviceId, 'OUI'):
+                desired_params['oui'] = inform.DeviceId.OUI
+            if hasattr(inform.DeviceId, 'ProductClass'):
+                desired_params['productClass'] = inform.DeviceId.ProductClass
+
+        return desired_params
 
 
 class IpToSerialMapping:
