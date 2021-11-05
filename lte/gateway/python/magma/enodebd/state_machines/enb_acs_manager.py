@@ -116,8 +116,8 @@ class StateMachineManager:
         if not is_enb_registered(self._service.mconfig, enb_serial):
             try:
                 self._send_device_info(inform, enb_serial)
-            except Exception as e:
-                logger.exception("Sending eNB PnP info failed", e)
+            except Exception:
+                logger.exception("Sending eNB PnP info failed")
             raise UnrecognizedEnodebError(
                 'eNB not registered to this Access '
                 'Gateway (serial #%s)' % enb_serial,
