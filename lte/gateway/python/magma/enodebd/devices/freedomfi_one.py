@@ -393,6 +393,9 @@ class FreedomFiOneMiscParameters(object):
 
     # Carrier aggregation
     CARRIER_AGG_ENABLE = "carrier_agg_enable"
+    CARRIER_AGG_CELL_ID = "carrier_agg_cell_id"
+    CARRIER_AGG_EARFCNDL = "carrier_agg_earfcndl"
+    CARRIER_AGG_TAC = "carrier_agg_tac"
     CARRIER_NUMBER = "carrier_number"  # Carrier aggregation params
     CONTIGUOUS_CC = "contiguous_cc"
     WEB_UI_ENABLE = "web_ui_enable"  # Enable or disable local enb UI
@@ -407,6 +410,21 @@ class FreedomFiOneMiscParameters(object):
             FAP_CONTROL + 'LTE.X_000E8F_RRMConfig.X_000E8F_CA_Enable',
             is_invasive=False,
             type=TrParameterType.BOOLEAN, is_optional=False,
+        ),
+        CARRIER_AGG_CELL_ID: TrParam(
+            FAPSERVICE_PATH + 'CellConfig.LTE.RAN.Common.X_000E8F_CellIdentity2',
+            is_invasive=False,
+            type=TrParameterType.UNSIGNED_INT, is_optional=False,
+        ),
+        CARRIER_AGG_EARFCNDL: TrParam(
+            FAPSERVICE_PATH + 'CellConfig.LTE.RAN.RF.X_000E8F_EARFCNDL2',
+            is_invasive=False,
+            type=TrParameterType.INT, is_optional=False,
+        ),
+        CARRIER_AGG_TAC: TrParam(
+            FAPSERVICE_PATH + 'CellConfig.LTE.EPC.X_000E8F_TAC2',
+            is_invasive=False,
+            type=TrParameterType.INT, is_optional=False,
         ),
         CARRIER_NUMBER: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_RRMConfig.X_000E8F_Cell_Number',
@@ -903,6 +921,26 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
         super().__init__()
         self.acs = acs
 
+    @staticmethod
+    def _set_carrier_agg_cell_id(cfg: EnodebConfiguration, cell_id: int,
+                                 ) -> None:
+        config_assert(cell_id in range(0, 268435456),
+            'Cell Identity 2 should be from 0 - (2^28 - 1)', )
+        cfg.set_parameter(FreedomFiOneMiscParameters.CARRIER_AGG_CELL_ID,
+                          cell_id)
+
+    @staticmethod
+    def _append_carrier_agg_pci(cfg: EnodebConfiguration, current_pci: Any,
+                                new_pci: Any, ) -> None:
+        if new_pci not in range(0, 504 + 1):
+            raise ConfigurationError('Invalid PCI (%d)' % new_pci)
+        cfg.set_parameter(ParameterName.PCI, f'{current_pci},{new_pci}')
+
+    @staticmethod
+    def _set_carrier_agg_tac(cfg: EnodebConfiguration, tac: Any,
+                         ) -> None:
+        cfg.set_parameter(FreedomFiOneMiscParameters.CARRIER_AGG_TAC, tac)
+
     def postprocess(
             self, mconfig: Any, service_cfg: Any,
             desired_cfg: EnodebConfiguration,
@@ -981,6 +1019,17 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
                 EnodebdLogger.warning("Ignoring attribute %s", name)
                 continue
             desired_cfg.set_parameter(name, val)
+
+        if desired_cfg.get_parameter(FreedomFiOneMiscParameters.CARRIER_AGG_ENABLE):
+            EnodebdLogger.info("Carrier aggregation enabled. Configuring")
+            cell_id = desired_cfg.get_parameter(ParameterName.CELL_ID)
+            self._set_carrier_agg_cell_id(desired_cfg, cell_id + 1)
+
+            pci = desired_cfg.get_parameter(ParameterName.PCI)
+            self._append_carrier_agg_pci(desired_cfg, pci, pci + 1)
+
+            tac = desired_cfg.get_parameter(ParameterName.TAC)
+            self._set_carrier_agg_tac(desired_cfg, tac)
 
     def _set_misc_params_from_service_config(self, service_cfg, desired_cfg):
         prim_src_name = FreedomFiOneMiscParameters.PRIM_SOURCE
