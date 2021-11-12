@@ -71,7 +71,7 @@ def is_enb_registered(mconfig: EnodebD, enb_serial: str) -> bool:
     if mconfig.enb_configs_by_serial is not None and \
             mconfig_serials_no > 0:
         return enb_serial in mconfig.enb_configs_by_serial
-    return True
+    return False
 
 
 def find_enb_by_cell_id(mconfig: EnodebD, cell_id: int) \
