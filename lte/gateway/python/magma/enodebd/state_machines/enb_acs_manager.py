@@ -235,7 +235,7 @@ class StateMachineManager:
             response.raise_for_status()
         except Exception as e:
             logger.warning("Sending eNodeB info failed")
-            if response:
+            if response is not None:
                 logger.warning(response.text)
             raise
 
