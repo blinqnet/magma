@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import re
 import requests
 from typing import Any, List, Optional
 
@@ -214,9 +215,36 @@ class StateMachineManager:
         acs_state_machine = device_handler_class(self._service)
         return acs_state_machine
 
+    @staticmethod
+    def _enb_is_valid(manufacturer, product_class, enb_serial):
+        if not manufacturer or not product_class:
+            return False
+
+        valid_enb = {
+            'Sercomm': {
+                'HeNB-TDD-Enterprise': [
+                    '[0-9]{4}[a-zA-Z]{2}[0-9]{7}'
+                ]
+            }
+        }
+
+        for pattern in valid_enb.get(manufacturer, {}).get(product_class, []):
+            if re.match(pattern, enb_serial):
+                return True
+
+        return False
+
     def _send_device_info(self, inform: models.Inform, enb_serial):
         device_params = self._retrieve_device_params(inform)
         device_params['serial'] = enb_serial
+
+        if not self._enb_is_valid(device_params['manufacturer'], device_params['productClass'], enb_serial):
+            logger.warning('eNodeB is not yet supported\n'
+                           f'Manufacturer: {device_params["manufacturer"]}\n'
+                           f'ProductClass: {device_params["productClass"]}\n'
+                           f'eNB serial: {enb_serial}')
+            return
+
         cfg = load_service_config('enodebd')
 
         with open(cfg['ffi_agw_serial_path'], 'r') as agw_serial_file:
