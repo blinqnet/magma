@@ -93,6 +93,10 @@ message SingleEnodebStatus {
   string gps_latitude = 11;
   string fsm_state = 12;
   StatusProperty rf_tx_desired = 13;
+  string enb_status = 14;
+  string sas_status = 15;
+  string software_version = 16;
+  string hardware_version = 17;
 }
 
 // --------------------------------------------------------------------------

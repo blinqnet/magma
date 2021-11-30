@@ -124,6 +124,10 @@ def get_all_status(client, args):
         _print_str_status_line('GPS Longitude', enb_status.gps_longitude)
         _print_str_status_line('GPS Latitude', enb_status.gps_latitude)
         _print_str_status_line('FSM State', enb_status.fsm_state)
+        _print_str_status_line('eNb Status', enb_status.enb_status)
+        _print_str_status_line('SAS Status', enb_status.sas_status)
+        _print_str_status_line('Software version', enb_status.software_version)
+        _print_str_status_line('Hardware version', enb_status.hardware_version)
         print('\n')
 
     status = client.GetAllEnodebStatus(Void())
@@ -154,7 +158,10 @@ def get_enb_status(client, args):
     _print_str_status_line('GPS Longitude', enb_status.gps_longitude)
     _print_str_status_line('GPS Latitude', enb_status.gps_latitude)
     _print_str_status_line('FSM State', enb_status.fsm_state)
-
+    _print_str_status_line('eNb Status', enb_status.enb_status)
+    _print_str_status_line('SAS Status', enb_status.sas_status)
+    _print_str_status_line('Software version', enb_status.software_version)
+    _print_str_status_line('Hardware version', enb_status.hardware_version)
 
 def _print_prop_status_line(header: str, value: int) -> None:
     """ Argument 'value' should be a StatusProperty enum """

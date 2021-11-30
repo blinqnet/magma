@@ -159,6 +159,10 @@ class EnodebdRpcServicer(EnodebdServicer):
                 gps_longitude=enb_status.gps_longitude,
                 gps_latitude=enb_status.gps_latitude,
                 fsm_state=enb_status.fsm_state,
+                enb_status=enb_status.enb_status,
+                sas_status=enb_status.sas_status,
+                software_version=enb_status.software_version,
+                hardware_version=enb_status.hardware_version,
             )
 
         return all_enb_status

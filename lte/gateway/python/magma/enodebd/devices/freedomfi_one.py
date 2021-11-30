@@ -191,6 +191,8 @@ class StatusParameters(object):
     SAS_STATUS = 'sasStatus'
     ENB_STATUS = 'enbStatus'
     GPS_SCAN_STATUS = 'gpsScanStatus'
+    SOFTWARE_VERSION = 'softwareVersion'
+    HARDWARE_VERSION = 'hardwareVersion'
 
     STATUS_PARAMETERS = {
         # Status nodes
@@ -209,6 +211,14 @@ class StatusParameters(object):
         ENB_STATUS: TrParam(
             STATUS_PATH + 'X_000E8F_eNB_Status', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
+        ),
+        SOFTWARE_VERSION: TrParam(
+            'Device.DeviceInfo.SoftwareVersion',
+            is_invasive=False, type=TrParameterType.STRING, is_optional=False,
+        ),
+        HARDWARE_VERSION: TrParam(
+            'Device.DeviceInfo.HardwareVersion',
+            is_invasive=False, type=TrParameterType.STRING, is_optional=False
         ),
 
         # GPS status, lat, long

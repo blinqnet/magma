@@ -21,6 +21,7 @@ from lte.protos.mconfig import mconfigs_pb2
 from magma.common import serialization_utils
 from magma.enodebd import metrics
 from magma.enodebd.data_models.data_model_parameters import ParameterName
+from magma.enodebd.devices.freedomfi_one import StatusParameters as FFParameterName
 from magma.enodebd.device_config.configuration_util import (
     find_enb_by_cell_id,
     get_enb_rf_tx_desired,
@@ -64,6 +65,10 @@ EnodebStatus = NamedTuple(
         ('mme_connected', bool),
         ('fsm_state', str),
         ('cell_id', int),
+        ('enb_status', str),
+        ('sas_status', str),
+        ('software_version', str),
+        ('hardware_version', str),
     ],
 )
 
@@ -303,6 +308,34 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
     except ConfigurationError:
         ptp_connected = False
 
+    try:
+        enb_status = \
+            enodeb.device_cfg.get_parameter(FFParameterName.ENB_STATUS)
+        if not enb_status:
+            enb_status = 'UNKNOWN'
+    except (KeyError, ConfigurationError):
+        enb_status = ''
+
+    try:
+        sas_status = \
+            enodeb.device_cfg.get_parameter(FFParameterName.SAS_STATUS)
+        if not sas_status:
+            sas_status = 'UNKNOWN'
+    except (KeyError, ConfigurationError):
+        sas_status = ''
+
+    try:
+        software_version = \
+            enodeb.device_cfg.get_parameter(FFParameterName.SOFTWARE_VERSION)
+    except (KeyError, ConfigurationError):
+        software_version = ''
+
+    try:
+        hardware_version = \
+            enodeb.device_cfg.get_parameter(FFParameterName.HARDWARE_VERSION)
+    except (KeyError, ConfigurationError):
+        hardware_version = ''
+
     return EnodebStatus(
         enodeb_configured=enodeb_configured,
         gps_latitude=gps_lat,
@@ -316,6 +349,10 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
         mme_connected=mme_connected,
         fsm_state=enodeb.get_state(),
         cell_id=enb_cell_id,
+        enb_status=enb_status,
+        sas_status=sas_status,
+        software_version=software_version,
+        hardware_version=hardware_version,
     )
 
 
@@ -354,6 +391,10 @@ def get_single_enb_status(
     enb_status.gps_longitude = status.gps_longitude
     enb_status.gps_latitude = status.gps_latitude
     enb_status.fsm_state = status.fsm_state
+    enb_status.enb_status = status.enb_status
+    enb_status.sas_status = status.sas_status
+    enb_status.software_version = status.software_version
+    enb_status.hardware_version = status.hardware_version
     return enb_status
 
 
@@ -458,6 +499,10 @@ def _empty_enb_status() -> SingleEnodebStatus:
     enb_status.gps_longitude = '0.0'
     enb_status.gps_latitude = '0.0'
     enb_status.fsm_state = 'N/A'
+    enb_status.enb_status = 'N/A'
+    enb_status.sas_status = 'N/A'
+    enb_status.software_version = 'N/A'
+    enb_status.hardware_version = 'N/A'
     return enb_status
 
 
