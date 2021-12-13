@@ -222,8 +222,15 @@ class StateMachineManager:
 
         valid_enb = {
             'Sercomm': {
+                # NOTE(oleksandr): FreedomFi One
                 'HeNB-TDD-Enterprise': [
                     '[0-9]{4}[a-zA-Z]{2}[0-9]{7}'
+                ]
+            },
+            'Baicells': {
+                # NOTE(oleksandr): Nova 430
+                'FAP/pBS3101S/SC': [
+                    r'\d{12}[A-Z0-9]{2}[a-zA-Z0-9]{1}\d{4}',
                 ]
             }
         }
