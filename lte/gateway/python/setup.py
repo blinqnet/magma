@@ -257,6 +257,7 @@ setup(
             'grpcio-tools>=1.16.1',
             'nose==1.3.7',
             'iperf3',
+            'parameterized==0.8.1',
         ],
     },
 )
