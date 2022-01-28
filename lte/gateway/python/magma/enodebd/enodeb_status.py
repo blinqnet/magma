@@ -466,6 +466,10 @@ def get_enb_s1_connected_states(
                 mme_connected=True,
                 fsm_state='N/A',
                 cell_id=enb_id,
+                enb_status='UNKNOWN',
+                sas_status='UNKNOWN',
+                software_version='',
+                hardware_version='',
             )
             status_dict = status._asdict()
 
