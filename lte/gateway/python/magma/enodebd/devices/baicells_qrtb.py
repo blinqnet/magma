@@ -426,6 +426,10 @@ class BaicellsQRTBTrDataModel(DataModel):
             path=DEVICE_PATH + 'DeviceInfo.SoftwareVersion', is_invasive=True,
             type=TrParameterType.STRING, is_optional=False,
         ),
+        ParameterName.HW_VERSION: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.HardwareVersion', is_invasive=False,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
         ParameterName.SERIAL_NUMBER: TrParam(
             path=DEVICE_PATH + 'DeviceInfo.SerialNumber', is_invasive=True,
             type=TrParameterType.STRING, is_optional=False,

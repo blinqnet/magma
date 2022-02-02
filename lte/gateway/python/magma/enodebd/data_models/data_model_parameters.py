@@ -28,6 +28,7 @@ class ParameterName():
     GPS_LAT = 'GPS lat'
     GPS_LONG = 'GPS long'
     SW_VERSION = 'SW version'
+    HW_VERSION = 'HW Version'
 
     SERIAL_NUMBER = 'Serial number'
     CELL_ID = 'Cell ID'
