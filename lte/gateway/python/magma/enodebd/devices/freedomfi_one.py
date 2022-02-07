@@ -26,7 +26,10 @@ from magma.enodebd.data_models.data_model_parameters import (
     TrParameterType,
 )
 from magma.enodebd.device_config.cbrs_consts import BAND
-from magma.enodebd.device_config.configuration_init import build_desired_config
+from magma.enodebd.device_config.configuration_init import (
+    build_desired_config,
+    config_assert,
+)
 from magma.enodebd.device_config.configuration_util import (
     calc_bandwidth_mhz,
     calc_bandwidth_rbs,
@@ -86,9 +89,7 @@ class SASParameters(object):
 
     # Sas management parameters
     # TODO move param definitions to ParameterNames class or think of something to make them more generic across devices
-    SAS_ENABLE = "sas_enabled"
     SAS_SERVER_URL = "sas_server_url"
-    SAS_UID = "sas_uid"
     SAS_CATEGORY = "sas_category"
     SAS_CHANNEL_TYPE = "sas_channel_type"
     SAS_CERT_SUBJECT = "sas_cert_subject"
@@ -97,8 +98,6 @@ class SASParameters(object):
     SAS_HEIGHT_TYPE = "sas_height_type"
     SAS_CPI_ENABLE = "sas_cpi_enable"
     SAS_CPI_IPE = "sas_cpi_ipe"  # Install param supplied enable
-    SAS_USER_ID = "sas_uid"  # TODO this should be set to a constant value in config
-    SAS_FCC_ID = "sas_fcc_id"
     FREQ_BAND1 = "freq_band_1"
     FREQ_BAND2 = "freq_band_2"
     # For CBRS radios we set this to the limit and the SAS can reduce the
@@ -106,7 +105,7 @@ class SASParameters(object):
     TX_POWER_CONFIG = "tx_power_config"
 
     SAS_PARAMETERS = {
-        SAS_ENABLE: TrParam(
+        ParameterName.SAS_ENABLED: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_SAS.Enable',
             is_invasive=False,
             type=TrParameterType.BOOLEAN,
@@ -117,11 +116,11 @@ class SASParameters(object):
             type=TrParameterType.STRING,
             is_optional=False,
         ),
-        SAS_USER_ID: TrParam(
+        ParameterName.SAS_USER_ID: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_SAS.UserContactInformation', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
-        SAS_FCC_ID: TrParam(
+        ParameterName.SAS_FCC_ID: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_SAS.FCCIdentificationNumber', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
@@ -188,11 +187,8 @@ class StatusParameters(object):
     # Status parameters
     DEFAULT_GW = 'defaultGW'
     SYNC_STATUS = 'syncStatus'
-    SAS_STATUS = 'sasStatus'
     ENB_STATUS = 'enbStatus'
     GPS_SCAN_STATUS = 'gpsScanStatus'
-    SOFTWARE_VERSION = 'softwareVersion'
-    HARDWARE_VERSION = 'hardwareVersion'
 
     STATUS_PARAMETERS = {
         # Status nodes
@@ -204,7 +200,7 @@ class StatusParameters(object):
             STATUS_PATH + 'X_000E8F_Sync_Status', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
-        SAS_STATUS: TrParam(
+        ParameterName.SAS_STATUS: TrParam(
             STATUS_PATH + 'X_000E8F_SAS_Status', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
@@ -212,15 +208,6 @@ class StatusParameters(object):
             STATUS_PATH + 'X_000E8F_eNB_Status', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
-        SOFTWARE_VERSION: TrParam(
-            'Device.DeviceInfo.SoftwareVersion',
-            is_invasive=False, type=TrParameterType.STRING, is_optional=False,
-        ),
-        HARDWARE_VERSION: TrParam(
-            'Device.DeviceInfo.HardwareVersion',
-            is_invasive=False, type=TrParameterType.STRING, is_optional=False
-        ),
-
         # GPS status, lat, long
         GPS_SCAN_STATUS: TrParam(
             'Device.FAP.GPS.ScanStatus',
@@ -308,8 +295,8 @@ class StatusParameters(object):
             return
 
         if (
-            name_to_val.get(cls.SAS_STATUS)
-            and name_to_val[cls.SAS_STATUS].upper() == success_str
+            name_to_val.get(ParameterName.SAS_STATUS)
+            and name_to_val[ParameterName.SAS_STATUS].upper() == success_str
         ):
             device_cfg.set_parameter(
                 param_name=ParameterName.RF_TX_STATUS,
@@ -669,6 +656,11 @@ class FreedomFiOneTrDataModel(DataModel):
             type=TrParameterType.STRING,
             is_optional=False,
         ),
+        ParameterName.HW_VERSION: TrParam(
+            DEVICE_PATH + 'DeviceInfo.HardwareVersion', is_invasive=False,
+            type=TrParameterType.STRING,
+            is_optional=False
+        ),
         ParameterName.SERIAL_NUMBER: TrParam(
             DEVICE_PATH + 'DeviceInfo.SerialNumber', is_invasive=False,
             type=TrParameterType.STRING,
@@ -820,6 +812,8 @@ class FreedomFiOneTrDataModel(DataModel):
         # We don't set these parameters
         ParameterName.BAND_CAPABILITY: transform_for_magma.band_capability,
         ParameterName.DUPLEX_MODE_CAPABILITY: transform_for_magma.duplex_mode,
+        ParameterName.GPS_LAT: transform_for_magma.gps_tr181,
+        ParameterName.GPS_LONG: transform_for_magma.gps_tr181,
     }
 
     @classmethod
@@ -1018,13 +1012,23 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
                 EnodebdLogger.error("Serial number unknown for device")
 
     def _verify_sas_params(self, service_cfg, desired_cfg):
+        config_map = {
+            'sas_enabled': ParameterName.SAS_ENABLED,
+            'sas_uid': ParameterName.SAS_USER_ID,
+            'sas_fcc_id': ParameterName.SAS_FCC_ID,
+        }
+
         sas_cfg = service_cfg.get(SAS_KEY)
         if not sas_cfg or not sas_cfg[SAS_ENABLE_KEY]:
-            desired_cfg.set_parameter(SASParameters.SAS_ENABLE, False)  # noqa: WPS425
+            desired_cfg.set_parameter(ParameterName.SAS_ENABLED, False)  # noqa: WPS425
             return
 
         sas_param_names = self.acs.data_model.get_sas_param_names()
         for name, val in sas_cfg.items():
+            config_name = config_map.get(name)
+            if config_name:
+                EnodebdLogger.debug("Transforming %s to %s", name, config_name)
+                name = config_name
             if name not in sas_param_names:
                 EnodebdLogger.warning("Ignoring attribute %s", name)
                 continue
@@ -1412,7 +1416,7 @@ class FreedomFiOneEndSessionState(EndSessionState):
             AcsMsgAndTransition
         """
         request = models.DummyInput()
-        if not self.acs.desired_cfg.get_parameter(SAS_ENABLE_KEY):
+        if not self.acs.desired_cfg.get_parameter(ParameterName.SAS_ENABLED):
             return AcsMsgAndTransition(request, self.notify_dp)
         return AcsMsgAndTransition(request, None)
 
@@ -1424,7 +1428,7 @@ class FreedomFiOneEndSessionState(EndSessionState):
             str
         """
         description = 'Completed provisioning eNB. Awaiting new Inform'
-        if not self.acs.desired_cfg.get_parameter(SAS_ENABLE_KEY):
+        if not self.acs.desired_cfg.get_parameter(ParameterName.SAS_ENABLED):
             description = 'Completed initial provisioning of the eNB. Awaiting update from DProxy'
         return description
 
