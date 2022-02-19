@@ -138,6 +138,13 @@ nginx:
   # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   affinity: {}
 
+  # Nginx stub metrics. Requires Prometheus Operator
+  exporter:
+    create: false
+    image:
+      repository: docker.io/nginx/nginx-prometheus-exporter
+      tag: 0.10.0
+      pullPolicy: IfNotPresent
 controller:
   # Configure pod disruption budgets for controller
   # ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
