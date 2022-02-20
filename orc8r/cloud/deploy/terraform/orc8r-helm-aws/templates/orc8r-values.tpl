@@ -216,7 +216,7 @@ nms:
         ssl_cert_key_name: controller.key
 
 logging:
-  enabled: ${enable_logging}
+  enabled: false
 
 dp:
   create: ${dp_enabled}
