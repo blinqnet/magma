@@ -504,6 +504,7 @@ variable "dp_sas_ca" {
   description = "SAS CA filename."
   type        = string
   default     = "ca.crt"
+}
 
 # FreedomFi Specific deployment flags
 ##############################################################################
