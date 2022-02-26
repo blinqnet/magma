@@ -55,6 +55,16 @@ spec:
           secret:
             secretName: {{ required "secret.envdir must be provided" .Values.secret.envdir }}
       containers:
+{{- if .Values.nginx.exporter.create }}
+        - name: {{ $serviceName }}-exporter
+          image: {{ .Values.nginx.exporter.image.repository }}:{{ .Values.nginx.exporter.image.tag }}
+          imagePullPolicy: {{ .Values.nginx.exporter.image.pullPolicy }}
+          args:
+            - -nginx-scrape-uri=127.0.0.1/stub_status
+          ports:
+            - name: metrics
+              containerPort: 9113
+{{- end }}
         - name: {{ $serviceName }}
           image: {{ required "nginx.image.repository must be provided" .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}
           imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}

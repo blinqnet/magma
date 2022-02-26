@@ -1,0 +1,21 @@
+{{- if .Values.nginx.exporter.create }}
+{{- $serviceName := print .Release.Name "-nginx" -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: nginx-proxy
+{{ include "labels" . | indent 4 }}
+{{ include "orc8r-labels" . | indent 4 }}
+  name: {{ $serviceName }}
+spec:
+  endpoints:
+  - path: /metrics
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: nginx-proxy
+{{- end }}
