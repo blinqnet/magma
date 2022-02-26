@@ -169,6 +169,7 @@ data "template_file" "orc8r_values" {
 
     controller_replicas = var.orc8r_controller_replicas
     nginx_replicas      = var.orc8r_proxy_replicas
+    nginx_metrics       = var.orc8r_nginx_metrics
 
     controller_hostname = format("controller.%s", var.orc8r_domain_name)
     api_hostname        = format("api.%s", var.orc8r_domain_name)

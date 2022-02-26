@@ -45,6 +45,8 @@ nginx:
         external-dns.alpha.kubernetes.io/hostname: ${controller_hostname}
     name: orc8r-bootstrap-nginx
     type: LoadBalancer
+  metrics:
+    enabled: ${nginx_metrics}
   spec:
     hostname: ${controller_hostname}
 
