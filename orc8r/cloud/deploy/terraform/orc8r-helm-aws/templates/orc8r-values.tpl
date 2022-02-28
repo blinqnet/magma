@@ -46,7 +46,7 @@ nginx:
     name: orc8r-bootstrap-nginx
     type: LoadBalancer
   metrics:
-    enabled: ${nginx_metrics}
+    create: ${nginx_metrics}
   spec:
     hostname: ${controller_hostname}
 
