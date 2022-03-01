@@ -10,7 +10,7 @@ metadata:
   name: {{ $serviceName }}
 spec:
   endpoints:
-  - path: /stub_status
+  - path: /metrics
     port: metrics
   namespaceSelector:
     matchNames:

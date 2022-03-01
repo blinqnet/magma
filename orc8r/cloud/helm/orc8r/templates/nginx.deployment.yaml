@@ -60,7 +60,7 @@ spec:
           image: {{ .Values.nginx.exporter.image.repository }}:{{ .Values.nginx.exporter.image.tag }}
           imagePullPolicy: {{ .Values.nginx.exporter.image.pullPolicy }}
           args:
-            - -nginx-scrape-uri=127.0.0.1/stub_status
+            - -nginx.scrape-uri=127.0.0.1/stub_status
           ports:
             - name: metrics
               containerPort: 9113
