@@ -318,7 +318,7 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
 
     try:
         sas_status = \
-            enodeb.device_cfg.get_parameter(FFParameterName.SAS_STATUS)
+            enodeb.device_cfg.get_parameter(ParameterName.SAS_STATUS)
         if not sas_status:
             sas_status = 'UNKNOWN'
     except (KeyError, ConfigurationError):

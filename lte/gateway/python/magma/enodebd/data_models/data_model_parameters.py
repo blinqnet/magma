@@ -92,7 +92,7 @@ class ParameterName():
     SAS_FCC_ID = 'SAS FCC ID'
     SAS_USER_ID = 'SAS User ID'
     SAS_RADIO_ENABLE = 'SAS Radio Enable'
-
+    SAS_STATUS = 'SAS status'
 
 class TrParameterType():
     BOOLEAN = 'boolean'

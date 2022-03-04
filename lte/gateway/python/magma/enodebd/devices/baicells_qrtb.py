@@ -15,7 +15,11 @@ from typing import Any, Callable, Dict, List, Optional
 from dp.protos.enodebd_dp_pb2 import CBSDRequest, CBSDStateResult
 from magma.common.service import MagmaService
 from magma.enodebd.data_models import transform_for_magma
-from magma.enodebd.data_models.data_model import DataModel, TrParam
+from magma.enodebd.data_models.data_model import (
+    DataModel,
+    TrParam,
+    InvalidTrParamPath,
+)
 from magma.enodebd.data_models.data_model_parameters import (
     ParameterName,
     TrParameterType,
@@ -362,7 +366,7 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
             serial_number=self.acs.device_cfg.get_parameter(ParameterName.SERIAL_NUMBER),
         )
         state = get_cbsd_state(request)
-        qrtb_update_desired_config_from_cbsd_state(state, self.acs.desired_cfg)
+        qrtb_update_desired_config_from_cbsd_state(state, self.acs.desired_cfg, self.acs.device_cfg)
 
 
 class BaicellsQRTBTrDataModel(DataModel):
@@ -580,6 +584,10 @@ class BaicellsQRTBTrDataModel(DataModel):
             path=DEVICE_PATH + 'DeviceInfo.SAS.RadioEnable', is_invasive=False,
             type=TrParameterType.BOOLEAN, is_optional=False,
         ),
+        ParameterName.SAS_STATUS: TrParam(
+            InvalidTrParamPath, is_invasive=False,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
     }
 
     NUM_PLMNS_IN_CONFIG = 6
@@ -728,18 +736,22 @@ class BaicellsQRTBTrConfigurationInitializer(EnodebConfigurationPostProcessor):
                 desired_cfg.delete_parameter(p)
 
 
-def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, config: EnodebConfiguration) -> None:
+def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_cfg: EnodebConfiguration, device_cfg: EnodebConfiguration) -> None:
     """
     Call grpc endpoint on the Domain Proxy to update the desired config based on sas grant
 
     Args:
         state (CBSDStateResult): state result as received from DP
-        config (EnodebConfiguration): configuration to update
+        desired_cfg (EnodebConfiguration): configuration to update
+        device_cfg (EnodebConfiguration): device configuration
     """
     logger.debug("Updating desired config based on sas grant")
-    config.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
+    desired_cfg.set_parameter(ParameterName.ADMIN_STATE, state.radio_enabled)
+    desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
+    device_cfg.set_parameter(ParameterName.RF_TX_STATUS, state.radio_enabled)
 
     if not state.radio_enabled:
+        device_cfg.set_parameter(ParameterName.SAS_STATUS, 'TRYING')
         return
 
     earfcn = calc_earfcn(state.channel.low_frequency_hz, state.channel.high_frequency_hz)
@@ -758,8 +770,9 @@ def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, config: E
     }
 
     for param, value in params_to_set.items():
-        config.set_parameter(param, value)
+        desired_cfg.set_parameter(param, value)
 
+    device_cfg.set_parameter(ParameterName.SAS_STATUS, 'SUCCESS')
 
 def _calc_psd(eirp: float) -> int:
     psd = int(eirp)
