@@ -93,6 +93,10 @@ nginx:
         port: 443
         targetPort: 9443
         nodePort: ""
+      metrics:
+        port: 9113
+        targetPort: 9113
+        nodePort: ""
       health:
         port: 80
         targetPort: 80

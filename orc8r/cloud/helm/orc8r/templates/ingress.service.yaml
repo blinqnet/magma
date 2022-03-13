@@ -139,6 +139,16 @@ spec:
       nodePort: {{ .nodePort }}
       {{- end }}
     {{- end }}
+    {{- if .Values.nginx.exporter.create }}
+    {{- with .Values.nginx.service.port.metrics }}
+    - name: metrics
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      {{- if (and (eq $serviceType "NodePort") (not (empty .nodePort))) }}
+      nodePort: {{ .nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
     {{- with .Values.nginx.service.port.clientcert }}
     - name: clientcert
       port: {{ .port }}
