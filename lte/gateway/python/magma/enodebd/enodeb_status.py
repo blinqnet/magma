@@ -69,6 +69,7 @@ EnodebStatus = NamedTuple(
         ('sas_status', str),
         ('software_version', str),
         ('hardware_version', str),
+        ('enodeb_model', str),
     ],
 )
 
@@ -336,6 +337,8 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
     except (KeyError, ConfigurationError):
         hardware_version = ''
 
+    enodeb_model = str(enodeb.device_name)
+
     return EnodebStatus(
         enodeb_configured=enodeb_configured,
         gps_latitude=gps_lat,
@@ -353,6 +356,7 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
         sas_status=sas_status,
         software_version=software_version,
         hardware_version=hardware_version,
+        enodeb_model=enodeb_model,
     )
 
 
@@ -396,6 +400,7 @@ def get_single_enb_status(
     enb_status.sas_status = status.sas_status
     enb_status.software_version = status.software_version
     enb_status.hardware_version = status.hardware_version
+    enb_status.enodeb_model = status.enodeb_model
     return enb_status
 
 
@@ -508,6 +513,7 @@ def _empty_enb_status() -> SingleEnodebStatus:
     enb_status.sas_status = 'N/A'
     enb_status.software_version = 'N/A'
     enb_status.hardware_version = 'N/A'
+    enb_status.enodeb_model = 'N/A'
     return enb_status
 
 

@@ -128,6 +128,7 @@ def get_all_status(client, args):
         _print_str_status_line('SAS Status', enb_status.sas_status)
         _print_str_status_line('Software version', enb_status.software_version)
         _print_str_status_line('Hardware version', enb_status.hardware_version)
+        _print_str_status_line('eNodeB Model', enb_status.enodeb_model)
         print('\n')
 
     status = client.GetAllEnodebStatus(Void())

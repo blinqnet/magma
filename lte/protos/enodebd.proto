@@ -97,6 +97,7 @@ message SingleEnodebStatus {
   string sas_status = 15;
   string software_version = 16;
   string hardware_version = 17;
+  string enodeb_model = 18;
 }
 
 // --------------------------------------------------------------------------

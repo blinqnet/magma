@@ -163,6 +163,7 @@ class EnodebdRpcServicer(EnodebdServicer):
                 sas_status=enb_status.sas_status,
                 software_version=enb_status.software_version,
                 hardware_version=enb_status.hardware_version,
+                enodeb_model=enb_status.enodeb_model,
             )
 
         return all_enb_status
