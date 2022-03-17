@@ -94,6 +94,8 @@ class ParameterName():
     SAS_RADIO_ENABLE = 'SAS Radio Enable'
     SAS_STATUS = 'SAS status'
 
+    WEB_UI_ENABLE = 'Web UI Enable'
+
 class TrParameterType():
     BOOLEAN = 'boolean'
     STRING = 'string'

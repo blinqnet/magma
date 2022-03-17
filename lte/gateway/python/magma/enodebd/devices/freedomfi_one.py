@@ -39,7 +39,10 @@ from magma.enodebd.device_config.enodeb_config_postprocessor import (
     EnodebConfigurationPostProcessor,
 )
 from magma.enodebd.device_config.enodeb_configuration import EnodebConfiguration
-from magma.enodebd.devices.device_utils import EnodebDeviceName
+from magma.enodebd.devices.device_utils import (
+    EnodebDeviceName,
+    verify_ui_enable,
+)
 from magma.enodebd.dp_client import get_cbsd_state
 from magma.enodebd.exceptions import ConfigurationError
 from magma.enodebd.logger import EnodebdLogger
@@ -73,7 +76,6 @@ from magma.enodebd.state_machines.enb_acs_states import (
 from magma.enodebd.tr069 import models
 
 SAS_KEY = 'sas'
-WEB_UI_ENABLE_LIST_KEY = 'web_ui_enable_list'
 SAS_ENABLE_KEY = 'sas_enabled'
 
 RADIO_MIN_POWER = 0
@@ -395,14 +397,8 @@ class FreedomFiOneMiscParameters(object):
     CARRIER_AGG_TAC = "carrier_agg_tac"
     CARRIER_NUMBER = "carrier_number"  # Carrier aggregation params
     CONTIGUOUS_CC = "contiguous_cc"
-    WEB_UI_ENABLE = "web_ui_enable"  # Enable or disable local enb UI
 
     MISC_PARAMETERS = {
-        WEB_UI_ENABLE: TrParam(
-            'Device.X_000E8F_DeviceFeature.X_000E8F_WebServerEnable',
-            is_invasive=False,
-            type=TrParameterType.BOOLEAN, is_optional=False,
-        ),
         CARRIER_AGG_ENABLE: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_RRMConfig.X_000E8F_CA_Enable',
             is_invasive=False,
@@ -454,7 +450,6 @@ class FreedomFiOneMiscParameters(object):
         CARRIER_AGG_ENABLE: True,
         CARRIER_NUMBER: 2,  # CBRS has two carriers
         CONTIGUOUS_CC: 0,  # Its not contiguous carrier
-        WEB_UI_ENABLE: False,  # Disable WebUI by default
     }
 
 
@@ -772,6 +767,11 @@ class FreedomFiOneTrDataModel(DataModel):
             type=TrParameterType.STRING,
             is_optional=False,
         ),
+        ParameterName.WEB_UI_ENABLE: TrParam(
+            'Device.X_000E8F_DeviceFeature.X_000E8F_WebServerEnable',
+            is_invasive=False,
+            type=TrParameterType.BOOLEAN, is_optional=False,
+        ),
     }
     TRANSFORMS_FOR_ENB = {}
     NUM_PLMNS_IN_CONFIG = 1
@@ -919,7 +919,6 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
     """
 
     SAS_KEY = 'sas'
-    WEB_UI_ENABLE_LIST_KEY = 'web_ui_enable_list'
 
     def __init__(self, acs: EnodebAcsStateMachine):
         super().__init__()
@@ -964,9 +963,11 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
         self._set_default_params(desired_cfg)
         self._increment_param_version_key()
         self._verify_cell_reserved_param(desired_cfg)
-        self._verify_ui_enable(service_cfg, desired_cfg)
         self._verify_sas_params(service_cfg, desired_cfg)
         self._set_misc_params_from_service_config(service_cfg, desired_cfg)
+
+        desired_cfg.set_parameter(ParameterName.WEB_UI_ENABLE, False)
+        verify_ui_enable(service_cfg, self.acs.device_cfg, desired_cfg)
 
     def _set_default_params(self, desired_cfg):
         """Set default parameters"""
@@ -994,22 +995,6 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
                 value=True,
                 object_name=object_name,
             )
-
-    def _verify_ui_enable(self, service_cfg, desired_cfg):
-        if WEB_UI_ENABLE_LIST_KEY in service_cfg:
-            serial_nos = service_cfg.get(WEB_UI_ENABLE_LIST_KEY)
-            if self.acs.device_cfg.has_parameter(
-                    ParameterName.SERIAL_NUMBER,
-            ):
-                if self.acs.get_parameter(ParameterName.SERIAL_NUMBER) in \
-                        serial_nos:
-                    desired_cfg.set_parameter(
-                        FreedomFiOneMiscParameters.WEB_UI_ENABLE,
-                        value=True,
-                    )
-            else:
-                # This should not happen
-                EnodebdLogger.error("Serial number unknown for device")
 
     def _verify_sas_params(self, service_cfg, desired_cfg):
         config_map = {

@@ -38,7 +38,10 @@ from magma.enodebd.device_config.enodeb_config_postprocessor import (
     EnodebConfigurationPostProcessor,
 )
 from magma.enodebd.device_config.enodeb_configuration import EnodebConfiguration
-from magma.enodebd.devices.device_utils import EnodebDeviceName
+from magma.enodebd.devices.device_utils import (
+    EnodebDeviceName,
+    verify_ui_enable,
+)
 from magma.enodebd.dp_client import get_cbsd_state
 from magma.enodebd.exceptions import ConfigurationError
 from magma.enodebd.logger import EnodebdLogger
@@ -187,7 +190,7 @@ class BaicellsQRTBHandler(BasicEnodebAcsStateMachine):
         Returns:
             EnodebConfigurationPostProcessor
         """
-        return BaicellsQRTBTrConfigurationInitializer()
+        return BaicellsQRTBTrConfigurationInitializer(self)
 
     @property
     def state_map(self) -> Dict[str, EnodebAcsState]:
@@ -588,6 +591,12 @@ class BaicellsQRTBTrDataModel(DataModel):
             InvalidTrParamPath, is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
+
+        ParameterName.WEB_UI_ENABLE: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.X_COM_LmtEnable',
+            is_invasive=False,
+            type=TrParameterType.BOOLEAN, is_optional=False,
+        ),
     }
 
     NUM_PLMNS_IN_CONFIG = 6
@@ -710,6 +719,10 @@ class BaicellsQRTBTrConfigurationInitializer(EnodebConfigurationPostProcessor):
     Overrides desired config on the State Machine
     """
 
+    def __init__(self, acs: EnodebAcsStateMachine):
+        super().__init__()
+        self.acs = acs
+
     def postprocess(self, mconfig: Any, service_cfg: Any, desired_cfg: EnodebConfiguration) -> None:
         """
         Add some params to the desired config
@@ -735,6 +748,8 @@ class BaicellsQRTBTrConfigurationInitializer(EnodebConfigurationPostProcessor):
             if desired_cfg.has_parameter(p):
                 desired_cfg.delete_parameter(p)
 
+        desired_cfg.set_parameter(ParameterName.WEB_UI_ENABLE, False)
+        verify_ui_enable(service_cfg, self.acs.device_cfg, desired_cfg)
 
 def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_cfg: EnodebConfiguration, device_cfg: EnodebConfiguration) -> None:
     """

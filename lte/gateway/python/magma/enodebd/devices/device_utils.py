@@ -13,6 +13,10 @@ limitations under the License.
 
 import re
 
+from typing import Any
+
+from magma.enodebd.data_models.data_model_parameters import ParameterName
+from magma.enodebd.device_config.enodeb_configuration import EnodebConfiguration
 from magma.enodebd.exceptions import UnrecognizedEnodebError
 from magma.enodebd.logger import EnodebdLogger
 
@@ -138,3 +142,17 @@ def _parse_sw_version(version_str):
     logger.debug('Parsed firmware version: %s', version_int)
 
     return version_int
+
+
+def verify_ui_enable(service_cfg: Any,
+                     device_cfg: EnodebConfiguration,
+                     desired_cfg: EnodebConfiguration):
+    web_ui_enable_list_key = 'web_ui_enable_list'
+
+    if web_ui_enable_list_key in service_cfg:
+        serial_nos = service_cfg.get(web_ui_enable_list_key)
+        if device_cfg.has_parameter(ParameterName.SERIAL_NUMBER, ):
+            if device_cfg.get_parameter(ParameterName.SERIAL_NUMBER) in serial_nos:
+                desired_cfg.set_parameter(ParameterName.WEB_UI_ENABLE, value=True                                          )
+        else:
+            EnodebdLogger.error("Serial number unknown for device")
