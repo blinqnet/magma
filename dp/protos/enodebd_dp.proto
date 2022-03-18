@@ -13,6 +13,8 @@ message CBSDRequest {
 message CBSDStateResult {
   LteChannel channel = 1;
   bool radio_enabled = 2;
+  int64 sas_response_code = 3;
+  string sas_response_message = 4;
 }
 
 message LteChannel {

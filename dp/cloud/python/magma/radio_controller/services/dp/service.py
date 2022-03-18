@@ -28,6 +28,7 @@ from magma.db_service.models import (
     DBRequest,
     DBRequestState,
     DBRequestType,
+    DBResponse,
 )
 from magma.db_service.session_manager import Session, SessionManager
 from magma.mappings.types import (
@@ -77,7 +78,12 @@ class DPService(DPServiceServicer):
                 channel = self._get_channel_with_authorized_grant(
                     session, cbsd,
                 )
-                result = self._build_result(channel)
+
+                sas_response_details = (0, '')
+                if not channel:
+                   sas_response_details = self._get_sas_response_details(session, cbsd)
+
+                result = self._build_result(channel, *sas_response_details)
             self._log_result(
                 session, 'GetCBSDState', result,
                 cbsd, request.serial_number,
@@ -270,9 +276,15 @@ class DPService(DPServiceServicer):
         ).first()
         return channel
 
-    def _build_result(self, channel: DBChannel):
+    def _build_result(self, channel: DBChannel,
+                      sas_response_code: int = 0,
+                      sas_response_message: str = '') -> CBSDStateResult:
         if not channel:
-            return CBSDStateResult(radio_enabled=False)
+            return CBSDStateResult(
+                radio_enabled=False,
+                sas_response_code=sas_response_code,
+                sas_response_message=sas_response_message,
+            )
         return CBSDStateResult(
             radio_enabled=True,
             channel=LteChannel(
@@ -316,3 +328,21 @@ class DPService(DPServiceServicer):
             fcc_id=f'{fcc_id}',
         )
         session.add(log)
+
+    def _get_sas_response_details(self, session:Session, cbsd: DBCbsd) -> (int, str):
+        data = {}
+        response_message = ''
+
+        response = session.query(DBResponse).join(DBRequest).filter(
+            DBRequest.cbsd == cbsd,
+        ).order_by(DBResponse.id.desc()).first()
+
+        if response:
+            data = response.payload['response']
+            response_message = data.get('responseMessage', '')
+
+        if not response_message and data.get('responseData'):
+            response_message = ', '.join(data.get('responseData', []))
+            response_message = f'Response data: {response_message}'
+
+        return data.get('responseCode', 0), response_message
