@@ -236,6 +236,8 @@ dp:
       pass: ${orc8r_db_pass}
 
   protocol_controller:
+    tlsConfig:
+      paths: {}
     enabled: false
     image:
       repository: "${docker_registry}/protocol-controller"
