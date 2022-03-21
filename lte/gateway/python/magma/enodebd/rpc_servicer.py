@@ -164,6 +164,8 @@ class EnodebdRpcServicer(EnodebdServicer):
                 software_version=enb_status.software_version,
                 hardware_version=enb_status.hardware_version,
                 enodeb_model=enb_status.enodeb_model,
+                dp_response_code=enb_status.dp_response_code,
+                dp_response_message=enb_status.dp_response_message,
             )
 
         return all_enb_status

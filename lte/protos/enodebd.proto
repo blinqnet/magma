@@ -98,6 +98,8 @@ message SingleEnodebStatus {
   string software_version = 16;
   string hardware_version = 17;
   string enodeb_model = 18;
+  uint64 dp_response_code = 19;
+  string dp_response_message = 20;
 }
 
 // --------------------------------------------------------------------------

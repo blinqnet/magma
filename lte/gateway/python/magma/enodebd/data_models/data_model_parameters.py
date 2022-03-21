@@ -94,6 +94,9 @@ class ParameterName():
     SAS_RADIO_ENABLE = 'SAS Radio Enable'
     SAS_STATUS = 'SAS status'
 
+    DP_RESPONSE_CODE = 'DP response code'
+    DP_RESPONSE_MESSAGE = 'DP response message'
+
     WEB_UI_ENABLE = 'Web UI Enable'
 
 class TrParameterType():

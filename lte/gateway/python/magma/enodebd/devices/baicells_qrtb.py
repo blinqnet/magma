@@ -597,6 +597,15 @@ class BaicellsQRTBTrDataModel(DataModel):
             is_invasive=False,
             type=TrParameterType.BOOLEAN, is_optional=False,
         ),
+
+        ParameterName.DP_RESPONSE_CODE: TrParam(
+            InvalidTrParamPath, is_invasive=False,
+            type=TrParameterType.INT, is_optional=False,
+        ),
+        ParameterName.DP_RESPONSE_MESSAGE: TrParam(
+            InvalidTrParamPath, is_invasive=False,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
     }
 
     NUM_PLMNS_IN_CONFIG = 6
@@ -764,6 +773,9 @@ def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_c
     desired_cfg.set_parameter(ParameterName.ADMIN_STATE, state.radio_enabled)
     desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
     device_cfg.set_parameter(ParameterName.RF_TX_STATUS, state.radio_enabled)
+
+    device_cfg.set_parameter(ParameterName.DP_RESPONSE_CODE, state.sas_response_code)
+    device_cfg.set_parameter(ParameterName.DP_RESPONSE_MESSAGE, state.sas_response_message)
 
     if not state.radio_enabled:
         device_cfg.set_parameter(ParameterName.SAS_STATUS, 'TRYING')

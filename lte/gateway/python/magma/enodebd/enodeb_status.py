@@ -70,6 +70,8 @@ EnodebStatus = NamedTuple(
         ('software_version', str),
         ('hardware_version', str),
         ('enodeb_model', str),
+        ('dp_response_code', int),
+        ('dp_response_message', str),
     ],
 )
 
@@ -339,6 +341,15 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
 
     enodeb_model = str(enodeb.device_name)
 
+    try:
+        dp_response_code = \
+            enodeb.device_cfg.get_parameter(ParameterName.DP_RESPONSE_CODE)
+        dp_response_message = \
+            enodeb.device_cfg.get_parameter(ParameterName.DP_RESPONSE_MESSAGE)
+    except (KeyError, ConfigurationError):
+        dp_response_code = 0
+        dp_response_message = ''
+
     return EnodebStatus(
         enodeb_configured=enodeb_configured,
         gps_latitude=gps_lat,
@@ -357,6 +368,8 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
         software_version=software_version,
         hardware_version=hardware_version,
         enodeb_model=enodeb_model,
+        dp_response_code=dp_response_code,
+        dp_response_message=dp_response_message,
     )
 
 
@@ -401,6 +414,8 @@ def get_single_enb_status(
     enb_status.software_version = status.software_version
     enb_status.hardware_version = status.hardware_version
     enb_status.enodeb_model = status.enodeb_model
+    enb_status.dp_response_code = status.dp_response_code
+    enb_status.dp_response_message = status.dp_response_message
     return enb_status
 
 
@@ -514,6 +529,8 @@ def _empty_enb_status() -> SingleEnodebStatus:
     enb_status.software_version = 'N/A'
     enb_status.hardware_version = 'N/A'
     enb_status.enodeb_model = 'N/A'
+    enb_status.dp_response_code = 0
+    enb_status.dp_response_message = ''
     return enb_status
 
 
