@@ -71,10 +71,16 @@ def set_orc8r_secretsmanager(secret_name: str,
 
     session = boto3.session.Session()
     client = session.client('secretsmanager', region)
-    resp = client.update_secret(
-        SecretId=secret_name,
-        SecretString=secret_string,
-    )
+    try:
+        resp = client.update_secret(
+            SecretId=secret_name,
+            SecretString=secret_string,
+        )
+    except Exception:
+        resp = client.create_secret(
+            Name=secret_name,
+            SecretString=secret_string,
+        )
     if resp['ResponseMetadata']['HTTPStatusCode'] != 200:
         raise Exception(f'Secretsmanager request failed. '
                         f'AWS Response: \n{json.dumps(resp, indent=2)}')
