@@ -52,24 +52,32 @@ def process_registration_response(obj: ResponseDBProcessor, response: DBResponse
 
     cbsd_id = response.payload.get("cbsdId", None)
     if response.response_code == ResponseCodes.DEREGISTER.value:
-        _terminate_all_grants_from_response(response, session)
+        _unregister_cbsd(response, session)
     elif response.response_code == ResponseCodes.SUCCESS.value and cbsd_id:
         payload = response.request.payload
-        cbsd = _find_cbsd_from_registration_request(session, payload)
+        cbsd = _find_cbsd_from_request(session, payload)
         cbsd.cbsd_id = cbsd_id
         _change_cbsd_state(cbsd, session, CbsdStates.REGISTERED.value)
 
 
-def _find_cbsd_from_registration_request(session: Session, payload: Dict) -> DBCbsd:
-    return session.query(DBCbsd).filter(
-        DBCbsd.cbsd_serial_number == payload["cbsdSerialNumber"],
-    ).scalar()
+def _find_cbsd_from_request(session: Session, payload: Dict) -> DBCbsd:
+    if "cbsdSerialNumber" in payload:
+        return session.query(DBCbsd).filter(
+            DBCbsd.cbsd_serial_number == payload["cbsdSerialNumber"],
+        ).scalar()
+    if "cbsdId" in payload:
+        return session.query(DBCbsd).filter(
+            DBCbsd.cbsd_id == payload["cbsdId"],
+        ).scalar()
 
 
 def _change_cbsd_state(cbsd: DBCbsd, session: Session, new_state: str) -> None:
+    if not cbsd:
+        return
     state = session.query(DBCbsdState).filter(
         DBCbsdState.name == new_state,
     ).scalar()
+    print(f"Changing {cbsd=} {cbsd.state=} to {new_state=}")
     cbsd.state = state
 
 
@@ -84,7 +92,7 @@ def process_spectrum_inquiry_response(obj: ResponseDBProcessor, response: DBResp
     """
 
     if response.response_code == ResponseCodes.DEREGISTER.value:
-        _terminate_all_grants_from_response(response, session)
+        _unregister_cbsd(response, session)
     elif response.response_code == ResponseCodes.SUCCESS.value:
         _create_channels(response, session)
 
@@ -125,6 +133,9 @@ def process_grant_response(obj: ResponseDBProcessor, response: DBResponse, sessi
     Returns:
         None
     """
+    if response.response_code == ResponseCodes.DEREGISTER.value:
+        _unregister_cbsd(response, session)
+        return
 
     grant = _get_or_create_grant_from_response(obj, response, session)
     if not grant:
@@ -174,6 +185,10 @@ def process_heartbeat_response(obj: ResponseDBProcessor, response: DBResponse, s
         None
     """
 
+    if response.response_code == ResponseCodes.DEREGISTER.value:
+        _unregister_cbsd(response, session)
+        return
+
     grant = _get_or_create_grant_from_response(obj, response, session)
     if not grant:
         return
@@ -213,6 +228,10 @@ def process_relinquishment_response(obj: ResponseDBProcessor, response: DBRespon
         None
     """
 
+    if response.response_code == ResponseCodes.DEREGISTER.value:
+        _unregister_cbsd(response, session)
+        return
+
     grant = _get_or_create_grant_from_response(obj, response, session)
     if not grant:
         return
@@ -242,11 +261,8 @@ def process_deregistration_response(obj: ResponseDBProcessor, response: DBRespon
         session: Database session
     """
 
-    _terminate_all_grants_from_response(response, session)
-    cbsd_id = response.payload.get("cbsdId", None)
-    if cbsd_id:
-        cbsd = session.query(DBCbsd).filter(DBCbsd.cbsd_id == cbsd_id).scalar()
-        _change_cbsd_state(cbsd, session, CbsdStates.UNREGISTERED.value)
+    print(f"Processing response {response.payload}")
+    _unregister_cbsd(response, session)
 
 
 def _reset_last_used_max_eirp(grant: DBGrant) -> None:
@@ -323,3 +339,10 @@ def _terminate_all_grants_from_response(response: DBResponse, session: Session) 
     session.query(DBGrant).filter(DBGrant.cbsd == cbsd).delete()
     logger.info(f"Deleting all channels for {cbsd_id=}")
     session.query(DBChannel).filter(DBChannel.cbsd == cbsd).delete()
+
+
+def _unregister_cbsd(response: DBResponse, session: Session) -> None:
+    payload = response.request.payload
+    cbsd = _find_cbsd_from_request(session, payload)
+    _terminate_all_grants_from_response(response, session)
+    _change_cbsd_state(cbsd, session, CbsdStates.UNREGISTERED.value)
