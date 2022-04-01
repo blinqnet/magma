@@ -367,6 +367,12 @@ variable "deploy_openvpn" {
   default     = false
 }
 
+
+variable "worker_connections" {
+  description = "Number of connections nginx can handle"
+  type        = number
+  default     = 1024
+}
 ##############################################################################
 # Thanos Object Storage
 ##############################################################################

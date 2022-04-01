@@ -49,6 +49,7 @@ nginx:
     create: ${nginx_metrics}
   spec:
     hostname: ${controller_hostname}
+    worker_connections: ${nginx_worker_connections}
 
 controller:
   podDisruptionBudget:

@@ -60,7 +60,7 @@ certs:
 
 nginx:
   create: true
-
+  
   # Configure pod disruption budgets for nginx
   # ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
   podDisruptionBudget:
@@ -117,6 +117,7 @@ nginx:
     # when nginx sees a variable in a server_name it needs a resolver
     # by default we'll use kube-dns
     resolver: "kube-dns.kube-system.svc.cluster.local valid=10s"
+    worker_connections: 1024
 
   # Number of nginx replicas desired
   replicas: 1
