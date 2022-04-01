@@ -63,11 +63,11 @@ def process_registration_response(obj: ResponseDBProcessor, response: DBResponse
 def _find_cbsd_from_request(session: Session, payload: Dict) -> DBCbsd:
     if "cbsdSerialNumber" in payload:
         return session.query(DBCbsd).filter(
-            DBCbsd.cbsd_serial_number == payload["cbsdSerialNumber"],
+            DBCbsd.cbsd_serial_number == payload.get("cbsdSerialNumber"),
         ).scalar()
     if "cbsdId" in payload:
         return session.query(DBCbsd).filter(
-            DBCbsd.cbsd_id == payload["cbsdId"],
+            DBCbsd.cbsd_id == payload.get("cbsdId"),
         ).scalar()
 
 
@@ -91,7 +91,10 @@ def process_spectrum_inquiry_response(obj: ResponseDBProcessor, response: DBResp
         session: Database session
     """
 
-    if response.response_code == ResponseCodes.DEREGISTER.value:
+    if any([
+        response.response_code == ResponseCodes.DEREGISTER.value,
+        _is_response_invalid_value_cbsd_id(response),
+    ]):
         _unregister_cbsd(response, session)
     elif response.response_code == ResponseCodes.SUCCESS.value:
         _create_channels(response, session)
@@ -133,7 +136,11 @@ def process_grant_response(obj: ResponseDBProcessor, response: DBResponse, sessi
     Returns:
         None
     """
-    if response.response_code == ResponseCodes.DEREGISTER.value:
+
+    if any([
+        response.response_code == ResponseCodes.DEREGISTER.value,
+        _is_response_invalid_value_cbsd_id(response),
+    ]):
         _unregister_cbsd(response, session)
         return
 
@@ -185,7 +192,10 @@ def process_heartbeat_response(obj: ResponseDBProcessor, response: DBResponse, s
         None
     """
 
-    if response.response_code == ResponseCodes.DEREGISTER.value:
+    if any([
+        response.response_code == ResponseCodes.DEREGISTER.value,
+        _is_response_invalid_value_cbsd_id(response),
+    ]):
         _unregister_cbsd(response, session)
         return
 
@@ -228,7 +238,10 @@ def process_relinquishment_response(obj: ResponseDBProcessor, response: DBRespon
         None
     """
 
-    if response.response_code == ResponseCodes.DEREGISTER.value:
+    if any([
+        response.response_code == ResponseCodes.DEREGISTER.value,
+        _is_response_invalid_value_cbsd_id(response),
+    ]):
         _unregister_cbsd(response, session)
         return
 
@@ -261,7 +274,7 @@ def process_deregistration_response(obj: ResponseDBProcessor, response: DBRespon
         session: Database session
     """
 
-    print(f"Processing response {response.payload}")
+    logger.info(f'process_deregistration_response: Unregistering {response.payload}')
     _unregister_cbsd(response, session)
 
 
@@ -346,3 +359,12 @@ def _unregister_cbsd(response: DBResponse, session: Session) -> None:
     cbsd = _find_cbsd_from_request(session, payload)
     _terminate_all_grants_from_response(response, session)
     _change_cbsd_state(cbsd, session, CbsdStates.UNREGISTERED.value)
+
+
+def _is_response_invalid_value_cbsd_id(response: DBResponse) -> bool:
+    if response.response_code != ResponseCodes.INVALID_VALUE.value:
+        return False
+
+    response_data = response.payload.get(
+        "response", {}).get("responseData", [])
+    return CBSD_ID in response_data
