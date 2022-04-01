@@ -54,7 +54,7 @@ def main():
         'backend': os.environ['PROXY_BACKENDS'],
         'resolver': os.environ['RESOLVER'],
         'service_registry_mode': os.environ.get('SERVICE_REGISTRY_MODE', 'yaml'),
-        'worker_connections': os.environ.get('WORKER_CONNECTIONS', '1024'),
+        'worker_connections': int(os.environ.get('WORKER_CONNECTIONS', '1024')),
     }
     _generate_config(context)
 

@@ -92,6 +92,8 @@ spec:
               value: {{ .Values.nginx.spec.resolver | quote }}
             - name: SERVICE_REGISTRY_MODE
               value: {{ .Values.controller.spec.service_registry.mode }}
+            - name: WORKER_CONNECTIONS
+              value: {{ .Values.nginx.spec.worker_connections | quote }}
           livenessProbe:
             tcpSocket:
               port: health
