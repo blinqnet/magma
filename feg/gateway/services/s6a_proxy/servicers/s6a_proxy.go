@@ -101,6 +101,10 @@ func NewS6aProxy(
 		clientCfg.WatchdogInterval = diameter.DefaultWatchdogIntervalSeconds
 	}
 
+	if clientCfg.RequestTimeout == 0 {
+		clientCfg.RequestTimeout = diameter.DefaultRequestTimeoutSeconds
+	}
+
 	smClient := &sm.Client{
 		Dict:               dict.Default,
 		Handler:            mux,
