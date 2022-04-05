@@ -405,8 +405,7 @@ def get_single_enb_status(
     enb_status.gps_connected = get_status_property(status.gps_connected)
     enb_status.ptp_connected = get_status_property(status.ptp_connected)
     enb_status.mme_connected = get_status_property(status.mme_connected)
-    # FIXME(oleksandr): Nova 430 2.8.12 doesn't return longitude
-    enb_status.gps_longitude = str(status.gps_longitude)
+    enb_status.gps_longitude = status.gps_longitude
     enb_status.gps_latitude = status.gps_latitude
     enb_status.fsm_state = status.fsm_state
     enb_status.enb_status = status.enb_status

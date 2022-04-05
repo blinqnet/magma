@@ -52,6 +52,8 @@ def gps_tr181(value: str) -> str:
     Returns:
         str: GPS value (latitude/longitude) in degrees
     """
+    if value is None:
+        return '0.0'
     try:
         return str(float(value) / 1e6)
     except Exception:  # pylint: disable=broad-except
