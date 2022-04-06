@@ -371,6 +371,19 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
         state = get_cbsd_state(request)
         qrtb_update_desired_config_from_cbsd_state(state, self.acs.desired_cfg, self.acs.device_cfg)
 
+        # FIXME(oleksandr): This logic relies on the fact, that CBRS is USA only (USA has negative longitude and China
+        # has positive longitude)
+        # The issue is caused by the bug in Baicells QRTB_2_8_15 firmware
+        gps_long = float(self.acs.device_cfg.get_parameter(ParameterName.GPS_LONG))
+        if gps_long > 0 and not hasattr(self.acs.desired_cfg, 'toggle_sas_enable'):
+            logger.info(f'GPS Longitude Incorrect: {gps_long}, toggling SAS enable')
+            self.acs.desired_cfg.set_parameter(ParameterName.SAS_ENABLED, 0)
+            self.acs.desired_cfg.toggle_sas_enable = 1
+            self.acs.device_cfg.set_parameter(ParameterName.GPS_STATUS, False)
+        elif hasattr(self.acs.desired_cfg, 'toggle_sas_enable') and self.acs.desired_cfg.toggle_sas_enable == 1:
+            self.acs.desired_cfg.toggle_sas_enable = 2
+            self.acs.desired_cfg.set_parameter(ParameterName.SAS_ENABLED, 1)
+            logger.info(f'GPS Longitude Incorrect: {gps_long}, toggling SAS enable back on')
 
 class BaicellsQRTBTrDataModel(DataModel):
     """
