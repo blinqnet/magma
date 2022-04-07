@@ -385,6 +385,15 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
             self.acs.desired_cfg.set_parameter(ParameterName.SAS_ENABLED, 1)
             logger.info(f'GPS Longitude Incorrect: {gps_long}, toggling SAS enable back on')
 
+
+class BaicellsQRTBParameters(ParameterName):
+    """
+    Class to represent device specific parameters that will be used in the
+    data model
+    """
+    LTE_WAN_CHECK_ENABLE = 'LTE WAN check enable'
+
+
 class BaicellsQRTBTrDataModel(DataModel):
     """
     Class to represent relevant data model parameters from TR-196/TR-098/TR-181.
@@ -619,6 +628,12 @@ class BaicellsQRTBTrDataModel(DataModel):
             InvalidTrParamPath, is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
+
+        BaicellsQRTBParameters.LTE_WAN_CHECK_ENABLE: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.X_COM_LTE_WAN_CHECK_ENABLE',
+            is_invasive=False,
+            type=TrParameterType.UNSIGNED_INT, is_optional=False,
+        ),
     }
 
     NUM_PLMNS_IN_CONFIG = 6
@@ -772,6 +787,10 @@ class BaicellsQRTBTrConfigurationInitializer(EnodebConfigurationPostProcessor):
 
         desired_cfg.set_parameter(ParameterName.WEB_UI_ENABLE, False)
         verify_ui_enable(service_cfg, self.acs.device_cfg, desired_cfg)
+
+        # NOTE(oleksandr): this configuration fixes the issue when device report
+        # MME is not connected, but it actually is
+        desired_cfg.set_parameter(BaicellsQRTBParameters.LTE_WAN_CHECK_ENABLE, 0)
 
 def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_cfg: EnodebConfiguration, device_cfg: EnodebConfiguration) -> None:
     """
