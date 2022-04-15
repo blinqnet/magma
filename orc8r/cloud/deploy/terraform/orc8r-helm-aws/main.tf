@@ -220,6 +220,6 @@ data "template_file" "orc8r_values" {
 
     region = var.region
 
-    worker_connections = var.worker_connections
+    nginx_worker_connections = var.nginx_worker_connections
   }
 }

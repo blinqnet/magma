@@ -368,7 +368,7 @@ variable "deploy_openvpn" {
 }
 
 
-variable "worker_connections" {
+variable "nginx_worker_connections" {
   description = "Number of connections nginx can handle"
   type        = number
   default     = 1024
