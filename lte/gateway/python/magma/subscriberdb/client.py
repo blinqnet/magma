@@ -13,6 +13,7 @@ limitations under the License.
 import asyncio
 import datetime
 import logging
+import random
 
 import grpc
 from lte.protos.s6a_service_pb2 import DeleteSubscriberRequest
@@ -77,7 +78,13 @@ class SubscriberDBCloudClient(SDWatchdogTask):
         # grpc_client_manager to manage grpc client recycling
         self._grpc_client_manager = grpc_client_manager
 
+        self._original_interval = sync_interval
+
     async def _run(self) -> None:
+        new_interval = self._original_interval + random.randint(0, self._original_interval)
+        logging.info(f'Setting job interval to {new_interval}')
+        self.set_interval(new_interval)
+
         subscribers, flat_digest = await self._get_all_subscribers()
         if subscribers is None:
             return
