@@ -231,7 +231,11 @@ class StateMachineManager:
                 # NOTE(oleksandr): Nova 430
                 'FAP/pBS3101S/SC': [
                     r'\d{12}[A-Z0-9]{2}[a-zA-Z0-9]{1}\d{4}',
-                ]
+                ],
+                # NOTE(oleksandr): Nova 436Q
+                'FAP/mBS31001/CA': [
+                    r'\d{12}[A-Z0-9]{2}[a-zA-Z0-9]{1}\d{4}',
+                ],
             }
         }
 
@@ -246,7 +250,7 @@ class StateMachineManager:
         device_params['serial'] = enb_serial
 
         if not self._enb_is_valid(device_params['manufacturer'], device_params['productClass'], enb_serial):
-            logger.warning('eNodeB is not yet supported\n'
+            logger.warning('FreedomFi Plug and Play is not yet supported for the eNodeB\n'
                            f'Manufacturer: {device_params["manufacturer"]}\n'
                            f'ProductClass: {device_params["productClass"]}\n'
                            f'eNB serial: {enb_serial}')
