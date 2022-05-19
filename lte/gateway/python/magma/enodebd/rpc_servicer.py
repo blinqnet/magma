@@ -166,6 +166,7 @@ class EnodebdRpcServicer(EnodebdServicer):
                 enodeb_model=enb_status.enodeb_model,
                 dp_response_code=enb_status.dp_response_code,
                 dp_response_message=enb_status.dp_response_message,
+                product_class=enb_status.product_class,
             )
 
         return all_enb_status

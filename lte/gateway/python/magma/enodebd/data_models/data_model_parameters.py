@@ -30,6 +30,7 @@ class ParameterName():
     SW_VERSION = 'SW version'
     HW_VERSION = 'HW Version'
 
+    PRODUCT_CLASS = 'Product class'
     SERIAL_NUMBER = 'Serial number'
     CELL_ID = 'Cell ID'
 

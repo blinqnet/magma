@@ -463,6 +463,10 @@ class BaicellsQRTBTrDataModel(DataModel):
             path=DEVICE_PATH + 'DeviceInfo.SerialNumber', is_invasive=True,
             type=TrParameterType.STRING, is_optional=False,
         ),
+        ParameterName.PRODUCT_CLASS: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.ProductClass', is_invasive=True,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
 
         # Capabilities
         ParameterName.DUPLEX_MODE_CAPABILITY: TrParam(

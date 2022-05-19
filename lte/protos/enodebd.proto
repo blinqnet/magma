@@ -100,6 +100,7 @@ message SingleEnodebStatus {
   string enodeb_model = 18;
   uint64 dp_response_code = 19;
   string dp_response_message = 20;
+  string product_class = 21;
 }
 
 // --------------------------------------------------------------------------

@@ -661,6 +661,10 @@ class FreedomFiOneTrDataModel(DataModel):
             type=TrParameterType.STRING,
             is_optional=False,
         ),
+        ParameterName.PRODUCT_CLASS: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.ProductClass', is_invasive=True,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
 
         # RF-related parameters
         ParameterName.EARFCNDL: TrParam(

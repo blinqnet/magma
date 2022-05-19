@@ -72,6 +72,7 @@ EnodebStatus = NamedTuple(
         ('enodeb_model', str),
         ('dp_response_code', int),
         ('dp_response_message', str),
+        ('product_class', str),
     ],
 )
 
@@ -350,6 +351,12 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
         dp_response_code = 0
         dp_response_message = ''
 
+    try:
+        product_class = \
+            enodeb.device_cfg.get_parameter(ParameterName.PRODUCT_CLASS)
+    except (KeyError, ConfigurationError):
+        product_class = ''
+
     return EnodebStatus(
         enodeb_configured=enodeb_configured,
         gps_latitude=gps_lat,
@@ -370,6 +377,7 @@ def get_enb_status(enodeb: EnodebAcsStateMachine) -> EnodebStatus:
         enodeb_model=enodeb_model,
         dp_response_code=dp_response_code,
         dp_response_message=dp_response_message,
+        product_class=product_class,
     )
 
 
@@ -415,6 +423,7 @@ def get_single_enb_status(
     enb_status.enodeb_model = status.enodeb_model
     enb_status.dp_response_code = status.dp_response_code
     enb_status.dp_response_message = status.dp_response_message
+    enb_status.product_class = status.product_class
     return enb_status
 
 
@@ -530,6 +539,7 @@ def _empty_enb_status() -> SingleEnodebStatus:
     enb_status.enodeb_model = 'N/A'
     enb_status.dp_response_code = 0
     enb_status.dp_response_message = ''
+    enb_status.product_class = ''
     return enb_status
 
 

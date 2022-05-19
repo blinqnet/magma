@@ -129,6 +129,7 @@ def get_all_status(client, args):
         _print_str_status_line('Software version', enb_status.software_version)
         _print_str_status_line('Hardware version', enb_status.hardware_version)
         _print_str_status_line('eNodeB Model', enb_status.enodeb_model)
+        _print_str_status_line('Product class', enb_status.product_class)
         _print_str_status_line('SAS Response Code', str(enb_status.dp_response_code))
         _print_str_status_line('SAS Response Message', enb_status.dp_response_message)
         print('\n')
