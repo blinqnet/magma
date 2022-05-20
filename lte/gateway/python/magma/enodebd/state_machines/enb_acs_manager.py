@@ -229,17 +229,20 @@ class StateMachineManager:
             },
             'Baicells': {
                 # NOTE(oleksandr): Nova 430
-                'FAP/pBS3101S/SC': [
+                'pBS3101S': [
                     r'\d{12}[A-Z0-9]{2}[a-zA-Z0-9]{1}\d{4}',
                 ],
                 # NOTE(oleksandr): Nova 436Q
-                'FAP/mBS31001/CA': [
+                'mBS31001': [
                     r'\d{12}[A-Z0-9]{2}[a-zA-Z0-9]{1}\d{4}',
                 ],
             }
         }
-
-        for pattern in valid_enb.get(manufacturer, {}).get(product_class, []):
+        for pattern in next(
+                (value
+                 for key, value in valid_enb.get(manufacturer, {}).items()
+                 if key in product_class),
+                []):
             if re.match(pattern, enb_serial):
                 return True
 
