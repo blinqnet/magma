@@ -43,6 +43,7 @@ from magma.enodebd.devices.device_utils import (
     EnodebDeviceName,
     verify_ui_enable,
 )
+from magma.enodebd.devices.freedomfi_utils import FreedomFiEndSesstionState
 from magma.enodebd.dp_client import get_cbsd_state
 from magma.enodebd.exceptions import ConfigurationError
 from magma.enodebd.logger import EnodebdLogger
@@ -92,7 +93,6 @@ class SASParameters(object):
     # Sas management parameters
     # TODO move param definitions to ParameterNames class or think of something to make them more generic across devices
     SAS_SERVER_URL = "sas_server_url"
-    SAS_CATEGORY = "sas_category"
     SAS_CHANNEL_TYPE = "sas_channel_type"
     SAS_CERT_SUBJECT = "sas_cert_subject"
     SAS_IC_GROUP_ID = "sas_icg_group_id"
@@ -126,7 +126,7 @@ class SASParameters(object):
             FAP_CONTROL + 'LTE.X_000E8F_SAS.FCCIdentificationNumber', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
-        SAS_CATEGORY: TrParam(
+        ParameterName.SAS_CBSD_CATEGORY: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_SAS.Category', is_invasive=False,
             type=TrParameterType.STRING,
             is_optional=False,
@@ -1382,7 +1382,7 @@ class FreedomFiOneGetObjectParametersState(EnodebAcsState):
         return 'Getting well known parameters'
 
 
-class FreedomFiOneEndSessionState(EndSessionState):
+class FreedomFiOneEndSessionState(FreedomFiEndSesstionState):
     """ To end a TR-069 session, send an empty HTTP response
 
     We can expect an inform message on

@@ -59,3 +59,6 @@ ffi_agw_serial_path: "/sys/devices/virtual/dmi/id/product_serial"
 #freedomfi PNP
 ffi_pnp_api:
 ffi_api_key:
+
+#freedomfi Status Interval measured in Inform messages count
+ffi_status_interval: 12

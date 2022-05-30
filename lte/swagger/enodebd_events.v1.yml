@@ -1,0 +1,12 @@
+---
+swagger: '2.0'
+
+info:
+  title: enodebd event definitions
+  description: These events occur in enodebd
+  version: 1.0.0
+
+definitions:
+  enodeb_status:
+    type: object
+    description: Used to track the eNodeb status

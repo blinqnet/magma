@@ -94,6 +94,7 @@ class ParameterName():
     SAS_USER_ID = 'SAS User ID'
     SAS_RADIO_ENABLE = 'SAS Radio Enable'
     SAS_STATUS = 'SAS status'
+    SAS_CBSD_CATEGORY = 'SAS CBSD category'
 
     DP_RESPONSE_CODE = 'DP response code'
     DP_RESPONSE_MESSAGE = 'DP response message'

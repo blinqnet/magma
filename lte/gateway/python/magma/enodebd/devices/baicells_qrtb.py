@@ -42,6 +42,7 @@ from magma.enodebd.devices.device_utils import (
     EnodebDeviceName,
     verify_ui_enable,
 )
+from magma.enodebd.devices.freedomfi_utils import FreedomFiEndSesstionState
 from magma.enodebd.dp_client import get_cbsd_state
 from magma.enodebd.exceptions import ConfigurationError
 from magma.enodebd.logger import EnodebdLogger
@@ -223,7 +224,7 @@ class BaicellsQRTBHandler(BasicEnodebAcsStateMachine):
         return 'unexpected_fault'
 
 
-class BaicellsQRTBEndSessionState(EnodebAcsState):
+class BaicellsQRTBEndSessionState(FreedomFiEndSesstionState):
     """ To end a TR-069 session, send an empty HTTP response
 
     For Baicells QRTB we can expect an inform message on
@@ -615,6 +616,10 @@ class BaicellsQRTBTrDataModel(DataModel):
         ),
         ParameterName.SAS_STATUS: TrParam(
             InvalidTrParamPath, is_invasive=False,
+            type=TrParameterType.STRING, is_optional=False,
+        ),
+        ParameterName.SAS_CBSD_CATEGORY: TrParam(
+            path=DEVICE_PATH + 'DeviceInfo.cbsdCategory', is_invasive=False,
             type=TrParameterType.STRING, is_optional=False,
         ),
 
