@@ -128,6 +128,7 @@ def get_all_status(client, args):
         _print_str_status_line('SAS Status', enb_status.sas_status)
         _print_str_status_line('Software version', enb_status.software_version)
         _print_str_status_line('Hardware version', enb_status.hardware_version)
+        _print_str_status_line('Manufacturer', enb_status.manufacturer)
         _print_str_status_line('eNodeB Model', enb_status.enodeb_model)
         _print_str_status_line('Product class', enb_status.product_class)
         _print_str_status_line('SAS Response Code', str(enb_status.dp_response_code))
@@ -166,6 +167,7 @@ def get_enb_status(client, args):
     _print_str_status_line('SAS Status', enb_status.sas_status)
     _print_str_status_line('Software version', enb_status.software_version)
     _print_str_status_line('Hardware version', enb_status.hardware_version)
+    _print_str_status_line('Manufacturer', enb_status.manufacturer)
     _print_str_status_line('DP Status Code', str(enb_status.dp_response_code))
     _print_str_status_line('DP Status Message', enb_status.dp_response_message)
 

@@ -452,6 +452,11 @@ class BaicellsQRTBTrDataModel(DataModel):
             path=DEVICE_PATH + 'FAP.GPS.LockedLongitude', is_invasive=True,
             type=TrParameterType.INT, is_optional=False,
         ),
+        ParameterName.MANUFACTURER: TrParam(
+            DEVICE_PATH + 'DeviceInfo.Manufacturer', is_invasive=False,
+            type=TrParameterType.STRING,
+            is_optional=False,
+        ),
         ParameterName.SW_VERSION: TrParam(
             path=DEVICE_PATH + 'DeviceInfo.SoftwareVersion', is_invasive=True,
             type=TrParameterType.STRING, is_optional=False,

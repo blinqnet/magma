@@ -646,6 +646,11 @@ class FreedomFiOneTrDataModel(DataModel):
         ),
 
         # Device info
+        ParameterName.MANUFACTURER: TrParam(
+            DEVICE_PATH + 'DeviceInfo.Manufacturer', is_invasive=False,
+            type=TrParameterType.STRING,
+            is_optional=False,
+        ),
         ParameterName.SW_VERSION: TrParam(
             DEVICE_PATH + 'DeviceInfo.SoftwareVersion', is_invasive=False,
             type=TrParameterType.STRING,
