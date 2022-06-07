@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: bootstrapper
     spec:
+      {{- with .Values.controller.bootstrapper.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "bootstrapper.container")}}

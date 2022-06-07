@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: tenants
     spec:
+      {{- with .Values.controller.tenants.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "tenants.container")}}

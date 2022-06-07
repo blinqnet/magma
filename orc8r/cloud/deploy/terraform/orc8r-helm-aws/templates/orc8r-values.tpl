@@ -24,7 +24,8 @@ secret:
 
 nginx:
   create: true
-
+  nodeSelector: 
+    ${nginx_node_selector}
   podDisruptionBudget:
     enabled: true
   image:
@@ -66,7 +67,46 @@ controller:
       user: ${orc8r_db_user}
     service_registry:
       mode: "k8s"
-
+  accessd:
+    nodeSelector: ${accessd_controller_node_selector}
+  analytics:
+    nodeSelector: ${analytics_controller_node_selector}
+  ctraced:
+    nodeSelector: ${ctraced_controller_node_selector}
+  device:
+    nodeSelector: ${device_controller_node_selector}
+  directoryd:
+    nodeSelector: ${directoryd_controller_node_selector}
+  dispatcher:
+    nodeSelector: ${dispatcher_controller_node_selector}
+  eventd:
+    nodeSelector: ${eventd_controller_node_selector}
+  obsidian:
+    nodeSelector: ${obsidian_controller_node_selector}
+  bootstrapper:
+    nodeSelector: ${bootstrapper_controller_node_selector}
+  streamer:
+    nodeSelector: ${streamer_controller_node_selector}
+  tenants:
+    nodeSelector: ${tenants_controller_node_selector}
+  certifier:
+    nodeSelector: ${certifier_controller_node_selector}
+  configurator:
+    nodeSelector: ${configurator_controller_node_selector}
+  state:
+    nodeSelector: ${state_controller_node_selector}
+  lte:
+    nodeSelector: ${lte_controller_node_selector}
+  metricsd:
+    nodeSelector: ${metricsd_controller_node_selector}
+  orchestrator:
+    nodeSelector: ${orchestrator_controller_node_selector}
+  cwf:
+    nodeSelector: ${cwf_controller_node_selector}
+  feg:
+    nodeSelector: ${feg_controller_node_selector}
+  nodeSelector: ${controller_node_selector}
+  
 metrics:
   imagePullSecrets:
     - name: ${image_pull_secret}
@@ -86,7 +126,9 @@ metrics:
     includeOrc8rAlerts: true
     prometheusCacheHostname: ${prometheus_cache_hostname}
     alertmanagerHostname: ${alertmanager_hostname}
-
+    nodeSelector: 
+      ${prometheus_node_selector}
+    
   alertmanager:
     create: true
 
@@ -110,6 +152,7 @@ metrics:
       repository: docker.io/facebookincubator/prometheus-edge-hub
       tag: 1.1.0
     limit: 500000
+  
   grafana:
     create: false
 
@@ -135,7 +178,9 @@ metrics:
         volumeSpec:
           persistentVolumeClaim:
             claimName: ${grafana_pvc_grafanaData}
-
+    nodeSelector: 
+      ${usergrafana_node_selector}
+    
   thanos:
     enabled: ${thanos_enabled}
 
@@ -202,6 +247,9 @@ nms:
         private_key_mount_path: ${private_key_mount_path}
         public_key_mount_path: ${public_key_mount_path}
 
+    nodeSelector: 
+      ${nms_node_selector}
+    
   nginx:
     create: true
 
@@ -215,7 +263,10 @@ nms:
       spec:
         ssl_cert_name: controller.crt
         ssl_cert_key_name: controller.key
-
+    
+    nodeSelector: 
+      ${nms_nginx_node_selector}
+    
 logging:
   enabled: false
 
@@ -235,7 +286,10 @@ dp:
       port: ${orc8r_db_port}
       user: ${orc8r_db_user}
       pass: ${orc8r_db_pass}
-
+    
+    nodeSelector: 
+      ${dp_node_selector}
+    
   protocol_controller:
     tlsConfig:
       paths: {}
@@ -243,7 +297,9 @@ dp:
     image:
       repository: "${docker_registry}/protocol-controller"
       tag: "${docker_tag}"
-
+    nodeSelector: 
+      ${dp_node_selector}
+    
   radio_controller:
     image:
       repository: "${docker_registry}/radio-controller"
@@ -256,11 +312,17 @@ dp:
       port: ${orc8r_db_port}
       user: ${orc8r_db_user}
       pass: ${orc8r_db_pass}
+    
+    nodeSelector: 
+      ${dp_node_selector}
 
   active_mode_controller:
     image:
       repository: "${docker_registry}/active-mode-controller"
       tag: "${docker_tag}"
+    
+    nodeSelector: 
+      ${dp_node_selector}
 
   db_service:
     image:
@@ -274,3 +336,6 @@ dp:
       port: ${orc8r_db_port}
       user: ${orc8r_db_user}
       pass: ${orc8r_db_pass}
+    
+    nodeSelector: 
+      ${dp_node_selector}

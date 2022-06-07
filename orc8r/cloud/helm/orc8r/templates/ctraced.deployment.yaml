@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: ctraced
     spec:
+      {{- with .Values.controller.ctraced.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "ctraced.container")}}

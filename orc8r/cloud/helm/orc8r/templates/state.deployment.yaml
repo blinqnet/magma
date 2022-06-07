@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: state
     spec:
+      {{- with .Values.controller.state.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "state.container")}}

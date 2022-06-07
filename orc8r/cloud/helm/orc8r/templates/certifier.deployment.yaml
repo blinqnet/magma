@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: certifier
     spec:
+      {{- with .Values.controller.certifier.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "certifier.container")}}

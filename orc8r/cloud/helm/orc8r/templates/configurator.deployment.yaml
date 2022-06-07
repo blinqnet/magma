@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: configurator
     spec:
+      {{- with .Values.controller.configurator.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "configurator.container")}}

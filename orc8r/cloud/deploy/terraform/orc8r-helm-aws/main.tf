@@ -203,7 +203,7 @@ data "template_file" "orc8r_values" {
     private_key_mount_path        = var.private_key_mount_path
     public_key_mount_path         = var.public_key_mount_path
 
-    prometheus_configurer_version = var.prometheus_configurer_version
+    prometheus_configurer_version   = var.prometheus_configurer_version
     alertmanager_configurer_version = var.alertmanager_configurer_version
 
     dp_enabled          = var.dp_enabled
@@ -221,5 +221,32 @@ data "template_file" "orc8r_values" {
     region = var.region
 
     nginx_worker_connections = var.nginx_worker_connections
+
+    nginx_node_selector                   = var.nginx_node_selector != {} ? jsonencode(var.nginx_node_selector) : "{}"
+    prometheus_node_selector              = var.prometheus_node_selector != {} ? jsonencode(var.prometheus_node_selector) : "{}"
+    usergrafana_node_selector             = var.usergrafana_node_selector != {} ? jsonencode(var.usergrafana_node_selector) : "{}"
+    nms_node_selector                     = var.nms_node_selector != {} ? jsonencode(var.nms_node_selector) : "{}"
+    nms_nginx_node_selector               = var.nms_nginx_node_selector != {} ? jsonencode(var.nms_nginx_node_selector) : "{}"
+    dp_node_selector                      = var.dp_node_selector != {} ? jsonencode(var.dp_node_selector) : "{}"
+    accessd_controller_node_selector      = var.accessd_controller_node_selector != {} ? jsonencode(var.accessd_controller_node_selector) : "{}"
+    analytics_controller_node_selector    = var.analytics_controller_node_selector != {} ? jsonencode(var.analytics_controller_node_selector) : "{}"
+    ctraced_controller_node_selector      = var.ctraced_controller_node_selector != {} ? jsonencode(var.ctraced_controller_node_selector) : "{}"
+    device_controller_node_selector       = var.device_controller_node_selector != {} ? jsonencode(var.device_controller_node_selector) : "{}"
+    directoryd_controller_node_selector   = var.directoryd_controller_node_selector != {} ? jsonencode(var.directoryd_controller_node_selector) : "{}"
+    dispatcher_controller_node_selector   = var.dispatcher_controller_node_selector != {} ? jsonencode(var.dispatcher_controller_node_selector) : "{}"
+    eventd_controller_node_selector       = var.eventd_controller_node_selector != {} ? jsonencode(var.eventd_controller_node_selector) : "{}"
+    obsidian_controller_node_selector     = var.obsidian_controller_node_selector != {} ? jsonencode(var.obsidian_controller_node_selector) : "{}"
+    bootstrapper_controller_node_selector = var.bootstrapper_controller_node_selector != {} ? jsonencode(var.bootstrapper_controller_node_selector) : "{}"
+    streamer_controller_node_selector     = var.streamer_controller_node_selector != {} ? jsonencode(var.streamer_controller_node_selector) : "{}"
+    tenants_controller_node_selector      = var.tenants_controller_node_selector != {} ? jsonencode(var.tenants_controller_node_selector) : "{}"
+    certifier_controller_node_selector    = var.certifier_controller_node_selector != {} ? jsonencode(var.certifier_controller_node_selector) : "{}"
+    configurator_controller_node_selector = var.configurator_controller_node_selector != {} ? jsonencode(var.configurator_controller_node_selector) : "{}"
+    state_controller_node_selector        = var.state_controller_node_selector != {} ? jsonencode(var.state_controller_node_selector) : "{}"
+    lte_controller_node_selector          = var.lte_controller_node_selector != {} ? jsonencode(var.lte_controller_node_selector) : "{}"
+    metricsd_controller_node_selector     = var.metricsd_controller_node_selector != {} ? jsonencode(var.metricsd_controller_node_selector) : "{}"
+    orchestrator_controller_node_selector = var.orchestrator_controller_node_selector != {} ? jsonencode(var.orchestrator_controller_node_selector) : "{}"
+    cwf_controller_node_selector          = var.cwf_controller_node_selector != {} ? jsonencode(var.cwf_controller_node_selector) : "{}"
+    feg_controller_node_selector          = var.feg_controller_node_selector != {} ? jsonencode(var.feg_controller_node_selector) : "{}"
+    controller_node_selector              = var.controller_node_selector != {} ? jsonencode(var.controller_node_selector) : "{}"
   }
 }

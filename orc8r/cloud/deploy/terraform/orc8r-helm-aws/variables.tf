@@ -534,3 +534,136 @@ variable "additional_payload_mount_path" {
   description = "Additional payload for license file mount path"
   type        = string
 }
+
+# Orc8r Node slectors
+##############################################################################
+
+variable "nginx_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "prometheus_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "usergrafana_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "nms_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "nms_nginx_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "dp_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "accessd_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "analytics_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "ctraced_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "device_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "directoryd_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "dispatcher_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "eventd_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "obsidian_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "bootstrapper_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "streamer_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "tenants_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "certifier_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "configurator_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "state_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "lte_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "metricsd_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "orchestrator_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "cwf_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "feg_controller_node_selector" {
+  type    = map(any)
+  default = {}
+}
+
+variable "controller_node_selector" {
+  type    = map(any)
+  default = {}
+}

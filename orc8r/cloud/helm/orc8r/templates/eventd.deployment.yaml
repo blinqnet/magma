@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: eventd
     spec:
+      {{- with .Values.controller.eventd.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "eventd.container")}}

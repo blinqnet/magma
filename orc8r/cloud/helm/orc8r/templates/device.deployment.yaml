@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: device
     spec:
+      {{- with .Values.controller.device.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "device.container")}}

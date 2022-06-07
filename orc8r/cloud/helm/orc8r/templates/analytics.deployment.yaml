@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: analytics
     spec:
+      {{- with .Values.controller.analytics.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "analytics.container")}}

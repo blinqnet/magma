@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: dispatcher
     spec:
+      {{- with .Values.controller.dispatcher.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "dispatcher.container")}}

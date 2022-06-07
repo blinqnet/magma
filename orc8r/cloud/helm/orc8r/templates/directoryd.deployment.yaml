@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: directoryd
     spec:
+      {{- with .Values.controller.directoryd.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "directoryd.container")}}

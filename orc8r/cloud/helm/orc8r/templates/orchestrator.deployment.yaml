@@ -25,6 +25,10 @@ spec:
       labels:
         app.kubernetes.io/component: orchestrator
     spec:
+      {{- with .Values.controller.orchestrator.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       -
 {{ include "orc8rlib.container" (list . "orchestrator.container")}}
