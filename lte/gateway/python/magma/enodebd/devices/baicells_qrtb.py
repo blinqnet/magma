@@ -236,7 +236,7 @@ class BaicellsQRTBEndSessionState(FreedomFiEndSesstionState):
             acs: EnodebAcsStateMachine,
             when_done: str,
     ):
-        super().__init__()
+        super().__init__(acs)
         self.acs = acs
         self.done_transition = when_done
 
