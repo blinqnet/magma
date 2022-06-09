@@ -44,14 +44,14 @@ class FreedomFiEndSesstionState(EndSessionState):
 
 def gather_enodeb_status(device_cfg: EnodebConfiguration) -> dict:
     return {
-        'hotspotType': 'enodeb',
-        'pubKey': os.environ.get('MINER_PUBKEY', ''),
-        'cbsdId': '{}{}'.format(device_cfg.get_parameter(ParameterName.SAS_FCC_ID),
+        'hotspot_type': 'enodeb',
+        'pubkey': os.environ.get('MINER_PUBKEY', ''),
+        'cbsd_id': '{}{}'.format(device_cfg.get_parameter(ParameterName.SAS_FCC_ID),
                                 device_cfg.get_parameter(ParameterName.SERIAL_NUMBER)),
-        'cellId': int(device_cfg.get_parameter(ParameterName.CELL_ID)),
-        'timestamp': int(datetime.timestamp(datetime.now())),
+        'cell_id': int(device_cfg.get_parameter(ParameterName.CELL_ID)),
+        'timestamp': datetime.now().astimezone().replace(microsecond=0).isoformat(),
         'longitude': float(device_cfg.get_parameter(ParameterName.GPS_LONG)),
         'latitude': float(device_cfg.get_parameter(ParameterName.GPS_LAT)),
-        'operationMode': bool(device_cfg.get_parameter(ParameterName.RF_TX_STATUS)),
-        'cbsdCategory': str(device_cfg.get_parameter(ParameterName.SAS_CBSD_CATEGORY)).upper(),
+        'operation_mode': bool(device_cfg.get_parameter(ParameterName.RF_TX_STATUS)),
+        'cbsd_category': str(device_cfg.get_parameter(ParameterName.SAS_CBSD_CATEGORY)).upper(),
     }
