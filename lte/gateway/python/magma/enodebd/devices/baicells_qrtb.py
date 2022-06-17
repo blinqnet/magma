@@ -531,8 +531,12 @@ class BaicellsQRTBTrDataModel(DataModel):
         ),
 
         # Other LTE parameters
+
+        # NOTE(oleksandr): Setting this value invasive to trigger reboot upon changing the value
+        # This is required due to bug in some models (430i, 436q) that prevents setting this field
+        # back to true after it was set to false
         ParameterName.ADMIN_STATE: TrParam(
-            path=FAPSERVICE_PATH + 'FAPControl.LTE.AdminState', is_invasive=False,
+            path=FAPSERVICE_PATH + 'FAPControl.LTE.AdminState', is_invasive=True,
             type=TrParameterType.BOOLEAN, is_optional=False,
         ),
         ParameterName.OP_STATE: TrParam(
@@ -816,9 +820,9 @@ def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_c
         device_cfg (EnodebConfiguration): device configuration
     """
     logger.debug("Updating desired config based on sas grant")
-    desired_cfg.set_parameter(ParameterName.ADMIN_STATE, state.radio_enabled)
+    desired_cfg.set_parameter(ParameterName.ADMIN_STATE,
+                              desired_cfg.get_parameter(ParameterName.ADMIN_STATE) & state.radio_enabled)
     desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
-    device_cfg.set_parameter(ParameterName.RF_TX_STATUS, state.radio_enabled)
 
     device_cfg.set_parameter(ParameterName.DP_RESPONSE_CODE, state.sas_response_code)
     device_cfg.set_parameter(ParameterName.DP_RESPONSE_MESSAGE, state.sas_response_message)
@@ -833,7 +837,6 @@ def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_c
     psd = _calc_psd(state.channel.max_eirp_dbm_mhz)
 
     params_to_set = {
-        ParameterName.SAS_RADIO_ENABLE: True,
         ParameterName.BAND: BAND,
         ParameterName.DL_BANDWIDTH: bandwidth_rbs,
         ParameterName.UL_BANDWIDTH: bandwidth_rbs,

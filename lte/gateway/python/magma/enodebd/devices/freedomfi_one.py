@@ -1453,9 +1453,9 @@ def ff_one_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired
         device_cfg (EnodebConfiguration): device configuration
     """
     EnodebdLogger.debug("Updating desired config based on sas grant")
-    desired_cfg.set_parameter(ParameterName.ADMIN_STATE, state.radio_enabled)
+    desired_cfg.set_parameter(ParameterName.ADMIN_STATE,
+                              desired_cfg.get_parameter(ParameterName.ADMIN_STATE) & state.radio_enabled)
     desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
-    device_cfg.set_parameter(ParameterName.RF_TX_STATUS, state.radio_enabled)
 
     if not state.radio_enabled:
         device_cfg.set_parameter(ParameterName.SAS_STATUS, 'TRYING')
