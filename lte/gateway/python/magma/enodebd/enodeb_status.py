@@ -507,6 +507,11 @@ def get_enb_s1_connected_states(
                 sas_status='UNKNOWN',
                 software_version='',
                 hardware_version='',
+                enodeb_model='',
+                product_class='',
+                manufacturer='',
+                dp_response_code=0,
+                dp_response_message='',
             )
             status_dict = status._asdict()
 

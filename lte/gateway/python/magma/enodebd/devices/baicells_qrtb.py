@@ -33,6 +33,7 @@ from magma.enodebd.device_config.configuration_util import (
     calc_bandwidth_mhz,
     calc_bandwidth_rbs,
     calc_earfcn,
+    get_enb_rf_tx_desired,
 )
 from magma.enodebd.device_config.enodeb_config_postprocessor import (
     EnodebConfigurationPostProcessor,
@@ -361,6 +362,7 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
     """
         BaicellsQRTB NotifyDPState implementation
     """
+    WAIT_INFORM_COUNT = 5
 
     def enter(self):
         """
@@ -371,20 +373,60 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
         )
         state = get_cbsd_state(request)
         qrtb_update_desired_config_from_cbsd_state(state, self.acs.desired_cfg, self.acs.device_cfg)
+        self._workaround_empty_gps()
+        self._workaround_rx_tx_off()
 
+    def _workaround_empty_gps(self):
         # FIXME(oleksandr): This logic relies on the fact, that CBRS is USA only (USA has negative longitude and China
         # has positive longitude)
         # The issue is caused by the bug in Baicells QRTB_2_8_15 firmware
         gps_long = float(self.acs.device_cfg.get_parameter(ParameterName.GPS_LONG))
         if gps_long > 0 and not hasattr(self.acs.desired_cfg, 'toggle_sas_enable'):
-            logger.info(f'GPS Longitude Incorrect: {gps_long}, toggling SAS enable')
+            logger.info(f'(GPS Workaround) GPS Longitude Incorrect: {gps_long}, toggling SAS enable')
             self.acs.desired_cfg.set_parameter(ParameterName.SAS_ENABLED, 0)
             self.acs.desired_cfg.toggle_sas_enable = 1
             self.acs.device_cfg.set_parameter(ParameterName.GPS_STATUS, False)
         elif hasattr(self.acs.desired_cfg, 'toggle_sas_enable') and self.acs.desired_cfg.toggle_sas_enable == 1:
             self.acs.desired_cfg.toggle_sas_enable = 2
             self.acs.desired_cfg.set_parameter(ParameterName.SAS_ENABLED, 1)
-            logger.info(f'GPS Longitude Incorrect: {gps_long}, toggling SAS enable back on')
+            logger.info(f'(GPS Workaround) GPS Longitude Incorrect: {gps_long}, toggling SAS enable back on')
+
+    def _workaround_rx_tx_off(self):
+        # NOTE(oleksandr): this function checks MME, RF TX actual and desired statuses
+        # In case MME and desired RF TX status is true, but RF TX actual is false, we need to wait some time
+        # to settle (WAIT_INFORM_COUNT Inform messages that happen every ~5sec)
+        # If actual RF TX status is still false, we try to set SAS_RADIO_ENABLE to false and then to true
+
+        serial_number = self.acs.device_cfg.get_parameter(ParameterName.SERIAL_NUMBER)
+        rf_tx_desired = get_enb_rf_tx_desired(self.acs.mconfig, serial_number)
+        mme_status = bool(self.acs.device_cfg.get_parameter(ParameterName.MME_STATUS))
+        rf_tx_status = not (self.acs.device_cfg.get_parameter(ParameterName.RF_TX_STATUS) == "false")
+
+        if not hasattr(self.acs.desired_cfg, 'toggle_radio_enable'):
+            self.acs.desired_cfg.toggle_radio_enable = 0
+
+        if (rf_tx_desired and mme_status and not rf_tx_status and
+                self.acs.desired_cfg.toggle_radio_enable != self.WAIT_INFORM_COUNT):
+            self.acs.desired_cfg.toggle_radio_enable += 1
+            logger.info(f'(RF TX Workaround) Desired RF TX {rf_tx_desired}, actual RF TX {rf_tx_status}, '
+                        f'MME status {mme_status}'
+                        f'(try {self.acs.desired_cfg.toggle_radio_enable}/{self.WAIT_INFORM_COUNT})')
+            if self.acs.desired_cfg.toggle_radio_enable != self.WAIT_INFORM_COUNT:
+                return
+
+            logger.info('(RF TX Workaround) Disabling SAS Radio')
+            self.acs.desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, False)
+            return
+
+        if self.acs.desired_cfg.toggle_radio_enable == self.WAIT_INFORM_COUNT:
+            self.acs.desired_cfg.toggle_radio_enable = 0
+            logger.info('(RF TX Workaround) Enabling SAS Radio')
+            self.acs.desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, True)
+            return
+
+        if self.acs.desired_cfg.toggle_radio_enable != 0:
+            self.acs.desired_cfg.toggle_radio_enable = 0
+            logger.info('(RF TX Workaround) Problem fixed')
 
 
 class BaicellsQRTBParameters(ParameterName):
