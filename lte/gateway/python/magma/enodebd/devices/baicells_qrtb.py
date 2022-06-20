@@ -652,6 +652,12 @@ class BaicellsQRTBTrDataModel(DataModel):
             is_invasive=False,
             type=TrParameterType.UNSIGNED_INT, is_optional=False,
         ),
+
+        # Carrier aggregation parameters
+        ParameterName.CARRIER_AGG_ENABLE: TrParam(
+            path=FAPSERVICE_PATH + 'CellConfig.LTE.RAN.CA.CaEnable', is_invasive=True,
+            type=TrParameterType.BOOLEAN, is_optional=False,
+        ),
     }
 
     NUM_PLMNS_IN_CONFIG = 6
@@ -809,6 +815,10 @@ class BaicellsQRTBTrConfigurationInitializer(EnodebConfigurationPostProcessor):
         # NOTE(oleksandr): this configuration fixes the issue when device report
         # MME is not connected, but it actually is
         desired_cfg.set_parameter(BaicellsQRTBParameters.LTE_WAN_CHECK_ENABLE, 0)
+
+        # NOTE(oleksandr): disable CA unconditionally until it implemented at DP side
+        desired_cfg.set_parameter(ParameterName.CARRIER_AGG_ENABLE, False)
+
 
 def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_cfg: EnodebConfiguration, device_cfg: EnodebConfiguration) -> None:
     """

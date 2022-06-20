@@ -101,6 +101,8 @@ class ParameterName():
     DP_RESPONSE_MESSAGE = 'DP response message'
 
     WEB_UI_ENABLE = 'Web UI Enable'
+    CARRIER_AGG_ENABLE = 'Carrier aggregation enable'
+
 
 class TrParameterType():
     BOOLEAN = 'boolean'

@@ -391,7 +391,6 @@ class FreedomFiOneMiscParameters(object):
     PRIM_SOURCE = "prim_src"
 
     # Carrier aggregation
-    CARRIER_AGG_ENABLE = "carrier_agg_enable"
     CARRIER_AGG_CELL_ID = "carrier_agg_cell_id"
     CARRIER_AGG_EARFCNDL = "carrier_agg_earfcndl"
     CARRIER_AGG_TAC = "carrier_agg_tac"
@@ -399,7 +398,7 @@ class FreedomFiOneMiscParameters(object):
     CONTIGUOUS_CC = "contiguous_cc"
 
     MISC_PARAMETERS = {
-        CARRIER_AGG_ENABLE: TrParam(
+        ParameterName.CARRIER_AGG_ENABLE: TrParam(
             FAP_CONTROL + 'LTE.X_000E8F_RRMConfig.X_000E8F_CA_Enable',
             is_invasive=False,
             type=TrParameterType.BOOLEAN, is_optional=False,
@@ -447,7 +446,7 @@ class FreedomFiOneMiscParameters(object):
         # Use IPV4 only
         TUNNEL_REF: "Device.IP.Interface.1.IPv4Address.1.",
         # Always enable carrier aggregation for the CBRS bands
-        CARRIER_AGG_ENABLE: True,
+        ParameterName.CARRIER_AGG_ENABLE: True,
         CARRIER_NUMBER: 2,  # CBRS has two carriers
         CONTIGUOUS_CC: 0,  # Its not contiguous carrier
     }
@@ -1028,7 +1027,7 @@ class FreedomFiOneConfigurationInitializer(EnodebConfigurationPostProcessor):
                 continue
             desired_cfg.set_parameter(name, val)
 
-        if desired_cfg.get_parameter(FreedomFiOneMiscParameters.CARRIER_AGG_ENABLE):
+        if desired_cfg.get_parameter(ParameterName.CARRIER_AGG_ENABLE):
             EnodebdLogger.info("Carrier aggregation enabled. Configuring")
             cell_id = desired_cfg.get_parameter(ParameterName.CELL_ID)
             self._set_carrier_agg_cell_id(desired_cfg, cell_id + 1)
