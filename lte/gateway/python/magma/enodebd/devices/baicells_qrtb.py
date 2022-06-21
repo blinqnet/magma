@@ -401,11 +401,16 @@ class BaicellsQRTBNotifyDPState(NotifyDPState):
         rf_tx_desired = get_enb_rf_tx_desired(self.acs.mconfig, serial_number)
         mme_status = bool(self.acs.device_cfg.get_parameter(ParameterName.MME_STATUS))
         rf_tx_status = not (self.acs.device_cfg.get_parameter(ParameterName.RF_TX_STATUS) == "false")
+        try:
+            sas_status = self.acs.device_cfg.get_parameter(ParameterName.SAS_STATUS) == 'SUCCESS'
+        except KeyError:
+            logger.debug("(RF TX Workaround) SAS status is unknown yet")
+            return
 
         if not hasattr(self.acs.desired_cfg, 'toggle_radio_enable'):
             self.acs.desired_cfg.toggle_radio_enable = 0
 
-        if (rf_tx_desired and mme_status and not rf_tx_status and
+        if (rf_tx_desired and mme_status and sas_status and not rf_tx_status and
                 self.acs.desired_cfg.toggle_radio_enable != self.WAIT_INFORM_COUNT):
             self.acs.desired_cfg.toggle_radio_enable += 1
             logger.info(f'(RF TX Workaround) Desired RF TX {rf_tx_desired}, actual RF TX {rf_tx_status}, '
