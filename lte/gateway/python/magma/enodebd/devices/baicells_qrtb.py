@@ -872,8 +872,6 @@ def qrtb_update_desired_config_from_cbsd_state(state: CBSDStateResult, desired_c
         device_cfg (EnodebConfiguration): device configuration
     """
     logger.debug("Updating desired config based on sas grant")
-    desired_cfg.set_parameter(ParameterName.ADMIN_STATE,
-                              desired_cfg.get_parameter(ParameterName.ADMIN_STATE) & state.radio_enabled)
     desired_cfg.set_parameter(ParameterName.SAS_RADIO_ENABLE, state.radio_enabled)
 
     device_cfg.set_parameter(ParameterName.DP_RESPONSE_CODE, state.sas_response_code)
