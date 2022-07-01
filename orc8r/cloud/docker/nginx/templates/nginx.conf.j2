@@ -38,7 +38,7 @@ http {
   map $srv $srvport {
     default 9070;
 {%- for service, value in service_registry.items() %}
-  {%- if value['proxy_type'] == 'clientcert' and service not in ('nprobe') %}
+  {%- if value['proxy_type'] == 'clientcert' %}
     {{ service }} {{ value.port }};
   {%- endif %}
   {%- if 'proxy_aliases' in value -%}
@@ -73,7 +73,7 @@ http {
 {%- endif %}
 
 {%- for service, value in service_registry.items() %}
-  {%- if value['proxy_type'] == 'clientcert' %}
+  {%- if value['proxy_type'] == 'clientcert'  and service not in ('nprobe') %}
   upstream orc8r-{{ service | replace("_","-") }} {
     least_conn;
     server orc8r-{{ service | replace("_","-") }}.{{ backend }}:9180 max_fails=0;
