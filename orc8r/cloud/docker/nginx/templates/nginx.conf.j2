@@ -73,7 +73,7 @@ http {
 {%- endif %}
 
 {%- for service, value in service_registry.items() %}
-  {%- if value['proxy_type'] == 'clientcert'  and service not in ('nprobe') %}
+  {%- if value['proxy_type'] == 'clientcert' and service not in ('nprobe') %}
   upstream orc8r-{{ service | replace("_","-") }} {
     least_conn;
     server orc8r-{{ service | replace("_","-") }}.{{ backend }}:9180 max_fails=0;
@@ -112,7 +112,7 @@ http {
       if ($k8s_svc ~* "(\w+)[_](\w+)") {
         set $k8s_svc "$1-$2";
       }
-      grpc_pass grpc://orc8r-{{ service }};
+      grpc_pass grpc://orc8r-$k8s_svc;
       grpc_set_header Host $srv-orc8r-$k8s_svc.{{ backend }}:9180;
 
       {%- else %}
