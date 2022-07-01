@@ -74,9 +74,9 @@ http {
 
 {%- for service, value in service_registry.items() %}
   {%- if value['proxy_type'] == 'clientcert' %}
-  upstream orc8r-{{ service }} {
+  upstream orc8r-{{ service | replace("_","-") }} {
     least_conn;
-    server orc8r-{{ service }}.{{ backend }}:9180 max_fails=0;
+    server orc8r-{{ service | replace("_","-") }}.{{ backend }}:9180 max_fails=0;
   }
   {%- endif %}
 {%- endfor %}
