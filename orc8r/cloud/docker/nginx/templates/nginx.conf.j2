@@ -38,7 +38,7 @@ http {
   map $srv $srvport {
     default 9070;
 {%- for service, value in service_registry.items() %}
-  {%- if value['proxy_type'] == 'clientcert' %}
+  {%- if value['proxy_type'] == 'clientcert' and service not in ('nprobe') %}
     {{ service }} {{ value.port }};
   {%- endif %}
   {%- if 'proxy_aliases' in value -%}
