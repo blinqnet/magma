@@ -77,7 +77,7 @@ http {
   upstream orc8r-{{ service | replace("_","-") }} {
     least_conn;
     {%- if service in ('metricsd') %}
-      server orc8r-{{ service | replace("_","-") }}.{{ backend }}:{{ value['port'] }} max_fails=0;
+      server orc8r-{{ service | replace("_","-") }}.{{ backend }}:{{ value['port'] }} max_fails=0 resolve;
     {%- else %}
       server orc8r-{{ service | replace("_","-") }}.{{ backend }}:9180 max_fails=0;
     {%- endif %}
