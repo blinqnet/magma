@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */}}
-
-{{- include "orc8rlib.service" (list . "analytics.service") -}}
+---
+{{ include "orc8rlib.service" (list . "analytics.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "analytics.headless-service") -}}
 {{- define "analytics.service" -}}
 metadata:
   name: orc8r-analytics
@@ -29,5 +31,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9200
+{{- end -}}
+{{- define "analytics.headless-service" -}}
+metadata:
+  name: orc8r-analytics-headless
+  labels:
+    {{- with .Values.analytics.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.analytics.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: analytics
+  ports:
+    - name: grpc
+      port: 9200
       targetPort: 9200
 {{- end -}}

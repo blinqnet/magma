@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */}}
-
-{{- include "orc8rlib.service" (list . "configurator.service") -}}
+---
+{{ include "orc8rlib.service" (list . "configurator.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "configurator.headless-service") -}}
 {{- define "configurator.service" -}}
 metadata:
   name: orc8r-configurator
@@ -29,5 +31,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9108
+{{- end -}}
+{{- define "configurator.headless-service" -}}
+metadata:
+  name: orc8r-configurator-headless
+  labels:
+    {{- with .Values.configurator.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.configurator.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: configurator
+  ports:
+    - name: grpc
+      port: 9108
       targetPort: 9108
 {{- end -}}

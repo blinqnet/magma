@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: dispatcher
     spec:
-      {{- with .Values.controller.dispatcher.nodeSelector }}
+      {{- with .Values.dispatcher.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

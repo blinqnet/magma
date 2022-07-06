@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "streamer.service") -}}
+---
+{{ include "orc8rlib.service" (list . "streamer.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "streamer.headless-service") -}}
 {{- define "streamer.service" -}}
 metadata:
   name: orc8r-streamer
@@ -29,5 +32,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9082
+{{- end -}}
+{{- define "streamer.headless-service" -}}
+metadata:
+  name: orc8r-streamer-headless
+  labels:
+    {{- with .Values.streamer.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.streamer.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: streamer
+  ports:
+    - name: grpc
+      port: 9082
       targetPort: 9082
 {{- end -}}

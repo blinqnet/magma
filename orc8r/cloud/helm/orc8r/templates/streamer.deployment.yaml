@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: streamer
     spec:
-      {{- with .Values.controller.streamer.nodeSelector }}
+      {{- with .Values.streamer.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

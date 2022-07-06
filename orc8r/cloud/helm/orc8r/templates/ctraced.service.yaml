@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "ctraced.service") -}}
+---
+{{ include "orc8rlib.service" (list . "ctraced.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "ctraced.headless-service") -}}
 {{- define "ctraced.service" -}}
 metadata:
   name: orc8r-ctraced
@@ -32,5 +35,27 @@ spec:
       targetPort: 9118
     - name: http
       port: 8080
+      targetPort: 10118
+{{- end -}}
+{{- define "ctraced.headless-service" -}}
+metadata:
+  name: orc8r-ctraced-headless
+  labels:
+    {{- with .Values.ctraced.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.ctraced.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: ctraced
+  ports:
+    - name: grpc
+      port: 9118
+      targetPort: 9118
+    - name: http
+      port: 10118
       targetPort: 10118
 {{- end -}}

@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: orchestrator
     spec:
-      {{- with .Values.controller.orchestrator.nodeSelector }}
+      {{- with .Values.orchestrator.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "orchestrator.service") -}}
+---
+{{ include "orc8rlib.service" (list . "orchestrator.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "orchestrator.headless-service") -}}
 {{- define "orchestrator.service" -}}
 metadata:
   name: orc8r-orchestrator
@@ -32,5 +35,27 @@ spec:
       targetPort: 9112
     - name: http
       port: 8080
+      targetPort: 10112
+{{- end -}}
+{{- define "orchestrator.headless-service" -}}
+metadata:
+  name: orc8r-orchestrator-headless
+  labels:
+    {{- with .Values.orchestrator.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.orchestrator.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: orchestrator
+  ports:
+    - name: grpc
+      port: 9112
+      targetPort: 9112
+    - name: http
+      port: 10112
       targetPort: 10112
 {{- end -}}

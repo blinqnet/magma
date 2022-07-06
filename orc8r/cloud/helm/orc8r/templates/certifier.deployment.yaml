@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: certifier
     spec:
-      {{- with .Values.controller.certifier.nodeSelector }}
+      {{- with .Values.certifier.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

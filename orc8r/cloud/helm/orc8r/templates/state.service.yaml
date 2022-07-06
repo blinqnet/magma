@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "state.service") -}}
+---
+{{ include "orc8rlib.service" (list . "state.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "state.headless-service") -}}
 {{- define "state.service" -}}
 metadata:
   name: orc8r-state
@@ -29,5 +32,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9105
+{{- end -}}
+{{- define "state.headless-service" -}}
+metadata:
+  name: orc8r-state-headless
+  labels:
+    {{- with .Values.state.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.state.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: state
+  ports:
+    - name: grpc
+      port: 9105
       targetPort: 9105
 {{- end -}}

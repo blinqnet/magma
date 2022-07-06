@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: ctraced
     spec:
-      {{- with .Values.controller.ctraced.nodeSelector }}
+      {{- with .Values.ctraced.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */}}
-
-{{- include "orc8rlib.service" (list . "accessd.service") -}}
+---
+{{- include "orc8rlib.service" (list . "accessd.service") }}
+---
+{{ include "orc8rlib.headless-service" (list . "accessd.headless-service") -}}
 {{- define "accessd.service" -}}
 metadata:
   name: orc8r-accessd
@@ -29,5 +31,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9091
+{{- end -}}
+{{- define "accessd.headless-service" -}}
+metadata:
+  name: orc8r-accessd-headless
+  labels:
+    {{- with .Values.accessd.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.accessd.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: accessd
+  ports:
+    - name: grpc
+      port: 9091
       targetPort: 9091
 {{- end -}}

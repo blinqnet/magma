@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */}}
 {{- define "orc8rlib.service.tpl" -}}
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -34,3 +35,31 @@ spec:
 {{- define "orc8rlib.service" -}}
 {{- include "orc8rlib.util.merge" (append . "orc8rlib.service.tpl") -}}
 {{- end -}}
+
+{{- define "orc8rlib.headless-service.tpl" -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-headless-svc
+  labels:
+    app.kubernetes.io/component: controller
+{{ include "default-labels" . | indent 4 }}
+spec:
+  selector:
+{{ include "default-selector-labels" . | indent 4 }}
+  type: None
+  # Standardize on service ports for gRPC and HTTP servers
+  ports:
+    - name: grpc
+      port: 9180
+      targetPort: 9180
+    - name: http
+      port: 8080
+      targetPort:  8080
+{{- end }}
+{{- define "orc8rlib.headless-service" -}}
+{{- include "orc8rlib.util.merge" (append . "orc8rlib.headless-service.tpl") -}}
+{{- end -}}
+
+

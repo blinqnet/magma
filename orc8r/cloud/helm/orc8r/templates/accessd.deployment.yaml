@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: accessd
     spec:
-      {{- with .Values.controller.accessd.nodeSelector }}
+      {{- with .Values.accessd.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

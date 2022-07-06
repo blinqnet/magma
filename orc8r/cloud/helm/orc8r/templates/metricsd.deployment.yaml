@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: metricsd
     spec:
-      {{- with .Values.controller.metricsd.nodeSelector }}
+      {{- with .Values.metricsd.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

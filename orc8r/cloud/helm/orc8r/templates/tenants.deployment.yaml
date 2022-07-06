@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: tenants
     spec:
-      {{- with .Values.controller.tenants.nodeSelector }}
+      {{- with .Values.tenants.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

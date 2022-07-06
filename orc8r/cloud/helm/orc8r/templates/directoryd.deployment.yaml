@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: directoryd
     spec:
-      {{- with .Values.controller.directoryd.nodeSelector }}
+      {{- with .Values.directoryd.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

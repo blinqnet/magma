@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "certifier.service") -}}
+---
+{{ include "orc8rlib.service" (list . "certifier.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "certifier.headless-service") -}}
 {{- define "certifier.service" -}}
 metadata:
   name: orc8r-certifier
@@ -29,5 +32,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9086
+{{- end -}}
+{{- define "certifier.headless-service" -}}
+metadata:
+  name: orc8r-certifier-headless
+  labels:
+    {{- with .Values.certifier.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.certifier.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: certifier
+  ports:
+    - name: grpc
+      port: 9086
       targetPort: 9086
 {{- end -}}

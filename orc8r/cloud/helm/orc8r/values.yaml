@@ -205,32 +205,38 @@ controller:
   affinity: {}
 
 accessd:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 analytics:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 bootstrapper:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 certifier:
+  nodeSelector: {}
   service:
     labels:
       orc8r.io/analytics_collector: "true"
     annotations: {}
 
 configurator:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 ctraced:
+  nodeSelector: {}
   service:
     labels:
       orc8r.io/obsidian_handlers: "true"
@@ -240,21 +246,25 @@ ctraced:
         /magma/v1/networks/:network_id/tracing,
 
 device:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 directoryd:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 dispatcher:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 eventd:
+  nodeSelector: {}
   service:
     labels:
       orc8r.io/obsidian_handlers: "true"
@@ -265,6 +275,7 @@ eventd:
         /magma/v1/events,
 
 metricsd:
+  nodeSelector: {}
   service:
     labels:
       orc8r.io/obsidian_handlers: "true"
@@ -278,6 +289,7 @@ metricsd:
         /magma/v1/tenants/targets_metadata,
 
 obsidian:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
@@ -301,23 +313,28 @@ orchestrator:
         /magma/v1/channels,
         /magma/v1/networks,
         /magma/v1/networks/:network_id,
+  nodeSelector: {}
 
 service_registry:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 state:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 streamer:
+  nodeSelector: {}
   service:
     labels: {}
     annotations: {}
 
 tenants:
+  nodeSelector: {}
   service:
     labels:
       orc8r.io/obsidian_handlers: "true"

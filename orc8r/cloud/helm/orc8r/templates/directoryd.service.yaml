@@ -11,7 +11,11 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "directoryd.service") -}}
+---
+{{ include "orc8rlib.service" (list . "directoryd.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "directoryd.headless-service") -}}
+
 {{- define "directoryd.service" -}}
 metadata:
   name: orc8r-directoryd
@@ -29,5 +33,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9100
+{{- end -}}
+{{- define "directoryd.headless-service" -}}
+metadata:
+  name: orc8r-directoryd
+  labels:
+    {{- with .Values.directoryd.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.directoryd.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: directoryd
+  ports:
+    - name: grpc
+      port: 9100
       targetPort: 9100
 {{- end -}}

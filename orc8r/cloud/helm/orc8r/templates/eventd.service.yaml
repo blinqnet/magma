@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "eventd.service") -}}
+---
+{{ include "orc8rlib.service" (list . "eventd.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "eventd.headless-service") -}}
 {{- define "eventd.service" -}}
 metadata:
   name: orc8r-eventd
@@ -32,5 +35,27 @@ spec:
       targetPort: 9121
     - name: http
       port: 8080
+      targetPort: 10121
+{{- end -}}
+{{- define "eventd.headless-service" -}}
+metadata:
+  name: orc8r-eventd-headless
+  labels:
+    {{- with .Values.eventd.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.eventd.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: eventd
+  ports:
+    - name: grpc
+      port: 9121
+      targetPort: 9121
+    - name: http
+      port: 10121
       targetPort: 10121
 {{- end -}}

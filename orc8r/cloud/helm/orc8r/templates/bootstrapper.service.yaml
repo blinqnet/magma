@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 */}}
-
-{{- include "orc8rlib.service" (list . "bootstrapper.service") -}}
+---
+{{ include "orc8rlib.service" (list . "bootstrapper.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "bootstrapper.headless-service") -}}
 {{- define "bootstrapper.service" -}}
 metadata:
   name: orc8r-bootstrapper
@@ -29,5 +31,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9088
+{{- end -}}
+{{- define "bootstrapper.headless-service" -}}
+metadata:
+  name: orc8r-bootstrapper-headless
+  labels:
+    {{- with .Values.bootstrapper.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.bootstrapper.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: bootstrapper
+  ports:
+    - name: grpc
+      port: 9088
       targetPort: 9088
 {{- end -}}

@@ -25,7 +25,7 @@ spec:
       labels:
         app.kubernetes.io/component: obsidian
     spec:
-      {{- with .Values.controller.obsidian.nodeSelector }}
+      {{- with .Values.obsidian.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 }}
       {{- end }}

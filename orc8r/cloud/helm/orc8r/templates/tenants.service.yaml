@@ -11,7 +11,10 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "tenants.service") -}}
+---
+{{ include "orc8rlib.service" (list . "tenants.service") -}}
+---
+{{ include "orc8rlib.service" (list . "tenants.service") -}}
 {{- define "tenants.service" -}}
 metadata:
   name: orc8r-tenants
@@ -32,5 +35,27 @@ spec:
       targetPort: 9110
     - name: http
       port: 8080
+      targetPort: 10110
+{{- end -}}
+{{- define "tenants.headless-service" -}}
+metadata:
+  name: orc8r-tenants-headless
+  labels:
+    {{- with .Values.tenants.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.tenants.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: tenants
+  ports:
+    - name: grpc
+      port: 9110
+      targetPort: 9110
+    - name: http
+      port: 10110
       targetPort: 10110
 {{- end -}}

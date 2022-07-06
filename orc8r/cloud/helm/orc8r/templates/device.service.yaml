@@ -11,7 +11,11 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "device.service") -}}
+---
+{{ include "orc8rlib.service" (list . "device.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "device.headless-service") -}}
+
 {{- define "device.service" -}}
 metadata:
   name: orc8r-device
@@ -29,5 +33,24 @@ spec:
   ports:
     - name: grpc
       port: 9180
+      targetPort: 9106
+{{- end -}}
+{{- define "device.headless-service" -}}
+metadata:
+  name: orc8r-device-headless
+  labels:
+    {{- with .Values.device.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.device.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: device
+  ports:
+    - name: grpc
+      port: 9106
       targetPort: 9106
 {{- end -}}

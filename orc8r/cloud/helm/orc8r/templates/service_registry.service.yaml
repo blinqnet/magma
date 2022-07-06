@@ -11,8 +11,30 @@
 # limitations under the License.
 */}}
 
-{{- include "orc8rlib.service" (list . "service_registry.service") -}}
+---
+{{ include "orc8rlib.service" (list . "service_registry.service") -}}
+---
+{{ include "orc8rlib.headless-service" (list . "service_registry.headless-service") -}}
 {{- define "service_registry.service" -}}
+metadata:
+  name: orc8r-service-registry
+  labels:
+    {{- with .Values.service_registry.service.labels }}
+{{ toYaml . | indent 4}}
+    {{- end}}
+  {{- with .Values.service_registry.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4}}
+  {{- end }}
+spec:
+  selector:
+    app.kubernetes.io/component: service_registry
+  ports:
+    - name: grpc
+      port: 9180
+      targetPort: 9180
+{{- end -}}
+{{- define "service_registry.headless-service" -}}
 metadata:
   name: orc8r-service-registry
   labels:
