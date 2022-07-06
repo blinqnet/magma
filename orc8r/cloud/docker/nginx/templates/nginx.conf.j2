@@ -76,11 +76,7 @@ http {
   {%- if value['proxy_type'] == 'clientcert' and service not in ('nprobe', 'wifi') %}
   upstream orc8r-{{ service | replace("_","-") }} {
     least_conn;
-    {%- if service in ('metricsd') %}
-    jdomain orc8r-{{ service | replace("_","-") }}.{{ backend }} port={{ value['port'] }} interval=10;
-    {%- else %}
-    server orc8r-{{ service | replace("_","-") }}.{{ backend }}:9180 max_fails=0;
-    {%- endif %}
+    jdomain orc8r-{{ service | replace("_","-") }}-headless.{{ backend }} port={{ value['port'] }} interval=10;
   }
   {%- endif %}
 {%- endfor %}
