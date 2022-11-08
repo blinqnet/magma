@@ -97,7 +97,7 @@ jobs:
           REGISTRY: ${{ env.DOCKER_REGISTRY }}
           IMAGE: ${{ env.DOCKER_IMAGE }}
           DOCKERFILE: ${{ env.DOCKER_FILE }}
-          PUSH: ${{ github.event_name == 'push' }}
+          PUSH: true
 
   build-c:
     runs-on: ubuntu-latest
