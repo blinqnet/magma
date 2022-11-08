@@ -30,11 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     if: success()
     needs:
-      - build-c
       - build-python
       - build-go
     outputs:
-      digest-c: ${{ needs.build-c.outputs.digest }}
       digest-python: ${{ needs.build-python.outputs.digest }}
       digest-go: ${{ needs.build-go.outputs.digest }}
     steps:
@@ -61,7 +59,6 @@ jobs:
 
       - name: Show docker image digests
         run: |
-          echo "digest-c:      ${{ needs.collect-is-successful.outputs.digest-c }}"
           echo "digest-python: ${{ needs.collect-is-successful.outputs.digest-python }}"
           echo "digest-go:     ${{ needs.collect-is-successful.outputs.digest-go }}"
 
@@ -72,7 +69,6 @@ jobs:
           repository: magma/magma
           event-type: agw-build-docker
           client-payload: '{
-            "digest-c":      "${{ needs.collect-is-successful.outputs.digest-c }}",
             "digest-python": "${{ needs.collect-is-successful.outputs.digest-python }}",
             "digest-go":     "${{ needs.collect-is-successful.outputs.digest-go }}"
             }'
