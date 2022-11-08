@@ -28,7 +28,6 @@ jobs:
 
   build-c-ghz:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'magma'
     needs: build-c
     env:
       DOCKER_REGISTRY: agw-ci.artifactory.magmacore.org
@@ -56,7 +55,6 @@ jobs:
 
   build-python-ghz:
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'magma'
     needs: build-python
     env:
       DOCKER_REGISTRY: agw-ci.artifactory.magmacore.org
@@ -83,7 +81,6 @@ jobs:
           PUSH: ${{ github.event_name == 'push' }}
 
   build-c:
-    if: github.repository_owner == 'magma'
     runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: agw-ci.artifactory.magmacore.org
@@ -110,7 +107,6 @@ jobs:
           PUSH: ${{ github.event_name == 'push' }}
 
   build-python:
-    if: github.repository_owner == 'magma'
     runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: agw-ci.artifactory.magmacore.org
@@ -137,7 +133,6 @@ jobs:
           PUSH: ${{ github.event_name == 'push' }}
 
   build-go:
-    if: github.repository_owner == 'magma'
     runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: agw-ci.artifactory.magmacore.org
@@ -180,7 +175,7 @@ jobs:
   check-is-successful:
     name: agw container build
     runs-on: ubuntu-latest
-    if: always() && github.repository_owner == 'magma'
+    if: always()
     needs:
       - collect-is-successful
     permissions:
